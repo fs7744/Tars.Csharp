@@ -4,4 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DotNetty.Codecs" Version="0.4.7" />
+    <PackageReference Include="DotNetty.Transport.Libuv.Experimental" Version="0.4.7" />
+  </ItemGroup>
+
 </Project>

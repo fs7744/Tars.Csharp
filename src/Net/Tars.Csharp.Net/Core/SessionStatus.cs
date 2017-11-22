@@ -1,4 +1,6 @@
-﻿namespace Tars.Csharp.Net.Core
+﻿using System;
+
+namespace Tars.Csharp.Net.Core
 {
     public enum SessionStatus
     {
