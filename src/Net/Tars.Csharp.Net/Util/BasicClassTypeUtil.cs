@@ -182,7 +182,7 @@ namespace Tars.Csharp.Core.Protocol.Util
             {
                 return "string";
             }
-            else if (srcType.IndexOf("System.Collections.Generic.IDictionary") == 0)
+            else if (srcType.IndexOf("System.Collections.Generic.QDictionary") == 0)
             {
                 return "map";
             }
@@ -196,9 +196,9 @@ namespace Tars.Csharp.Core.Protocol.Util
             }
         }
 
-        public static bool IsIDictionary(string cls)
+        public static bool IsQDictionary(string cls)
         {
-            return cls.IndexOf("System.Collections.Generic.IDictionary") == 0;
+            return cls.IndexOf("System.Collections.Generic.QDictionary") == 0;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using DotNetty.Transport.Bootstrapping;
+﻿using DotNetty.Buffers;
+using DotNetty.Codecs;
+using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using DotNetty.Transport.Libuv;
@@ -85,6 +87,12 @@ namespace Tars.Csharp.Net
             return this;
         }
 
+        public ServerBootstrapBudiler ConfigChannelPipeline(Action<IChannelPipeline> configChannelPipeline)
+        {
+            this.configChannelPipeline = configChannelPipeline;
+            return this;
+        }
+
         public async Task RuncAsync(TimeSpan quietPeriod, TimeSpan timeout)
         {
             Contract.Requires(channelFactory != null);
@@ -96,8 +104,11 @@ namespace Tars.Csharp.Net
                 var bootstrap = new ServerBootstrap();
                 bootstrap.Group(group.Item1, group.Item2)
                     .ChannelFactory(channelFactory)
-                    .ChildHandler(new ActionChannelInitializer<IChannel>(
-                        channel => configChannelPipeline?.Invoke(channel.Pipeline)));
+                    .ChildHandler(new ActionChannelInitializer<IChannel>(channel => 
+                    {
+                        channel.Pipeline.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, 100 * 1024 * 1024, 0, 4, -4, 0, true));
+                        configChannelPipeline?.Invoke(channel.Pipeline);
+                    }));
                 foreach (var item in options.Values)
                 {
                     item.Set(bootstrap);

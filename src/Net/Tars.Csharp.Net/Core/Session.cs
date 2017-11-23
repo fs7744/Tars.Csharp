@@ -55,6 +55,6 @@ namespace Tars.Csharp.Net.Core
 
         public abstract int GetRemotePort();
 
-        public abstract IProtocolFactory GetProtocolFactory();
+        //public abstract IProtocolFactory GetProtocolFactory();
     }
 }
