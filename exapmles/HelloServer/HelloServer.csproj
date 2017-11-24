@@ -6,7 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Net\Tars.Csharp.Net\Tars.Csharp.Net.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Tars.Csharp.Codecs\Tars.Csharp.Codecs.csproj" />
+    <ProjectReference Include="..\..\src\Tars.Csharp.Rpc\Tars.Csharp.Rpc.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,23 +1,33 @@
-﻿using DotNetty.Codecs;
-using System;
-using System.Net;
-using Tars.Csharp.Net;
-using Tars.Csharp.Net.Protocol;
+﻿using DotNetty.Buffers;
+using DotNetty.Codecs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using Tars.Csharp.Network.Hosting;
 
 namespace HelloServer
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            new ServerBootstrapBudiler()
-             .UseLibuvTcp()
-             .ConfigChannelPipeline(i =>
-             {
-                 i.AddLast(new TarsDecoder());
-             })
-             .Bind(new IPEndPoint(IPAddress.Any, 8080))
-             .RuncAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1)).Wait();
+            var kv = new Dictionary<string, string>()
+            {
+                { ServerHostOptions.Port, "8989" }
+            };
+
+            new ServerHostBuilder()
+                .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
+                .ConfigureServices(i => i.AddLogging(j => j.AddConsole()))
+                .UseUdp((i, j) =>
+                {
+                    var config = i.GetRequiredService<IConfigurationRoot>();
+                    var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
+                    j.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, packetMaxSize, 0, 4, -4, 0, true));
+                })
+                .Build()
+                .Run();
         }
     }
 }
