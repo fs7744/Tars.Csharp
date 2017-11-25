@@ -655,6 +655,62 @@ namespace Tars.Csharp.Codecs
             return ReadArray(s, tag, isRequire);
         }
 
+        public IDictionary<K, V> ReadMap<K, V>(IDictionary<K, V> m, int tag, bool isRequire)
+        {
+            if (m == null)
+            {
+                return null;
+            }
+
+            var mk = default(K);
+            var mv = default(V);
+
+            if (SkipToTag(tag))
+            {
+                HeadData hd = new HeadData();
+                ReadHead(hd);
+                switch (hd.Type)
+                {
+                    case (byte)TarsStructType.Map:
+                        {
+                            int size = Read(0, 0, true);
+                            if (size < 0)
+                            {
+                                throw new TarsDecodeException("size invalid: " + size);
+                            }
+                            for (int i = 0; i < size; ++i)
+                            {
+                                mk = (K)Read(mk, 0, true);
+                                mv = (V)Read(mv, 1, true);
+
+                                if (mk != null)
+                                {
+                                    if (m.ContainsKey(mk))
+                                    {
+                                        m[mk] = mv;
+                                    }
+                                    else
+                                    {
+                                        m.Add(mk, mv);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+
+                    default:
+                        {
+                            throw new TarsDecodeException("type mismatch.");
+                        }
+                }
+            }
+            else if (isRequire)
+            {
+                throw new TarsDecodeException("require field not exist.");
+            }
+            return m;
+        }
+
         public IDictionary ReadMap<T>(int tag, bool isRequire)
         {
             T m = (T)BasicClassTypeUtil.CreateObject<T>();
@@ -753,6 +809,12 @@ namespace Tars.Csharp.Codecs
                 throw new TarsDecodeException("require field not exist.");
             }
             return lr;
+        }
+
+        public byte[] ReadBytes(int tag, bool isRequire)
+        {
+            byte[] cache_sBuffer = null;
+            return Read(cache_sBuffer, tag, isRequire);
         }
 
         public byte[] Read(byte[] l, int tag, bool isRequire)

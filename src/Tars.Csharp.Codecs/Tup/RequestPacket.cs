@@ -20,9 +20,9 @@ namespace Tars.Csharp.Codecs.Tup
 
         public int Timeout { get; set; }
 
-        public Dictionary<string, string> Context { get; set; }
+        public IDictionary<string, string> Context { get; set; }
 
-        public Dictionary<string, string> Status { get; set; }
+        public IDictionary<string, string> Status { get; set; }
 
         public override void ReadFrom(TarsInputStream inputStream)
         {
@@ -33,13 +33,11 @@ namespace Tars.Csharp.Codecs.Tup
             ServantName = inputStream.ReadString(5, true);
             FuncName = inputStream.ReadString(6, true);
 
-            var cache_sBuffer = new byte[] { 0 };
-            Buffer = (byte[])inputStream.Read<byte[]>(cache_sBuffer, 7, true);
+            Buffer = inputStream.ReadBytes(7, true);
             Timeout = inputStream.Read(Timeout, 8, true);
 
-            Dictionary<string, string> cache_context = null;
-            Context = (Dictionary<string, string>)inputStream.Read(cache_context, 9, true);
-            Status = (Dictionary<string, string>)inputStream.Read(cache_context, 10, true);
+            Context = inputStream.ReadMap<string, string>(new Dictionary<string, string>(), 9, true);
+            Status = inputStream.ReadMap<string, string>(new Dictionary<string, string>(), 10, true);
         }
 
         //public override void WriteTo(TarsOutputStream outputStream)
