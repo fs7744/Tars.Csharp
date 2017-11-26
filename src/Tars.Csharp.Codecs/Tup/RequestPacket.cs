@@ -24,6 +24,10 @@ namespace Tars.Csharp.Codecs.Tup
 
         public IDictionary<string, string> Status { get; set; }
 
+        public int Ret { get; set; }
+
+        public string ResultDesc { get; set; }
+
         public override void ReadFrom(TarsInputStream inputStream)
         {
             Version = inputStream.Read(Version, 1, true);
@@ -42,16 +46,46 @@ namespace Tars.Csharp.Codecs.Tup
 
         public override void WriteTo(TarsOutputStream outputStream)
         {
+            outputStream.PutZero();
             outputStream.Write(Version, 1);
             outputStream.Write(PacketType, 2);
-            outputStream.Write(MessageType, 3);
-            outputStream.Write(RequestId, 4);
-            outputStream.Write(ServantName, 5);
-            outputStream.Write(FuncName, 6);
-            outputStream.Write(Buffer, 7);
-            outputStream.Write(Timeout, 8);
-            outputStream.Write(Context, 9);
-            outputStream.Write(Status, 10);
+            switch (Version)
+            {
+                case Const.Version:
+                    outputStream.Write(RequestId, 3);
+                    outputStream.Write(MessageType, 4);
+                    outputStream.Write(Ret, 5);
+                    outputStream.Write(Buffer, 6);
+                    if (Status != null && Status.Count > 0)
+                    {
+                        outputStream.Write(Status, 7);
+                    }
+                    if (Ret != Const.ServerSuccess)
+                    {
+                        outputStream.Write(ResultDesc ?? "", 8);
+                    }
+                    break;
+                case Const.Version2:
+                case Const.Version3:
+                    outputStream.Write(MessageType, 3);
+                    outputStream.Write(RequestId, 4);
+                    outputStream.Write(ServantName, 5);
+                    outputStream.Write(FuncName, 6);
+                    outputStream.Write(Buffer, 7);
+                    outputStream.Write(Timeout, 8);
+                    if (Status != null && Status.Count > 0)
+                    {
+                        outputStream.Write(Status, 9);
+                    }
+                    if (Context != null && Context.Count > 0)
+                    {
+                        outputStream.Write(Context, 10);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            outputStream.PutDataLength();
         }
     }
 }

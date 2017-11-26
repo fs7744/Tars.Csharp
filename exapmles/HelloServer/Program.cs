@@ -1,4 +1,5 @@
 ﻿using DotNetty.Buffers;
+using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Network.Hosting;
 using Tars.Csharp.Rpc.Protocol;
@@ -25,13 +27,14 @@ namespace HelloServer
             new ServerHostBuilder()
                 .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
                 .ConfigureServices(i => i.AddLogging(j => j.AddConsole().SetMinimumLevel(LogLevel.Trace)))
-                .UseTcp((i, j) =>
+                .UseUdp((i, j) =>
                 {
-                    //var config = i.GetRequiredService<IConfigurationRoot>();
-                    //var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
-                    //j.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, packetMaxSize, 0, 4, -4, 0, true));
-                    //j.AddLast(new TarsDecoder());
-                    j.AddLast(new LoggingHandler(i.GetRequiredService<ILogger<LoggingHandler>>()), new TestHandler());
+                    var config = i.GetRequiredService<IConfigurationRoot>();
+                    var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
+                    j.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, packetMaxSize, 0, 4, -4, 0, true));
+                    j.AddLast(new TarsDecoder(), new TarsEncoder());
+                    //j.AddLast(new LoggingHandler(i.GetRequiredService<ILogger<LoggingHandler>>()));
+                    j.AddLast(new TestHandler());
                 })
                 .Build()
                 .Run();
@@ -76,7 +79,13 @@ namespace HelloServer
             {
                 var ps = test.ReadFrom(m);
                 var ret = test.Method.Invoke(this, ps) as Task<string>;
-                ctx.WriteAndFlushAsync(ret.Result);
+                m.Ret = Const.ServerSuccess;
+                IByteBuffer buffer = Unpooled.Buffer(128);
+                var s = new TarsOutputStream(buffer);
+                s.Write(ret.Result, 0);
+                m.Buffer = s.ToByteArray();
+                buffer.Release();
+                ctx.WriteAndFlushAsync(m);
                 Console.WriteLine(ret.Result);
             }
             else

@@ -18,7 +18,7 @@ namespace Tars.Csharp.Codecs
 
         public byte[] ToByteArray()
         {
-            byte[] newBytes = new byte[buf.WriterIndex + 1];
+            byte[] newBytes = new byte[buf.WriterIndex];
             buf.SetReaderIndex(0);
             buf.ReadBytes(newBytes, 0, newBytes.Length);
             buf.SetReaderIndex(0);
@@ -102,6 +102,19 @@ namespace Tars.Csharp.Codecs
                 WriteHead((byte)TarsStructType.Int, tag);
                 buf.WriteInt(n);
             }
+        }
+
+        public void PutZero()
+        {
+            buf.WriteInt(0);
+        }
+
+        public void PutDataLength()
+        {
+            var len = buf.WriterIndex;
+            buf.SetWriterIndex(0);
+            buf.WriteInt(len);
+            buf.SetWriterIndex(len);
         }
 
         public void Write(uint n, int tag)
