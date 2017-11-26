@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
@@ -27,21 +27,20 @@ namespace HelloServer
             new ServerHostBuilder()
                 .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
                 .ConfigureServices(i => i.AddLogging(j => j.AddConsole()))
-                .UseUdp((i, j) =>
+                .UseTcp((i, j) =>
                 {
-                    var config = i.GetRequiredService<IConfigurationRoot>();
-                    var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
-                    j.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, packetMaxSize, 0, 4, -4, 0, true));
-                    j.AddLast(new TarsDecoder());
+                    //var config = i.GetRequiredService<IConfigurationRoot>();
+                    //var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
+                    //j.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, packetMaxSize, 0, 4, -4, 0, true));
+                    //j.AddLast(new TarsDecoder());
                     j.AddLast(new TestHandler());
                 })
                 .Build()
                 .Run();
         }
-
     }
 
-    public class TestHandler : SimpleChannelInboundHandler<RequestPacket>
+    public class TestHandler : ChannelHandlerAdapter
     {
         public Task<string> Hello(int no, string name)
         {
@@ -49,6 +48,7 @@ namespace HelloServer
         }
 
         private TarsMethodInfo test;
+
         public TestHandler()
         {
             test = new TarsMethodInfo()
@@ -72,16 +72,28 @@ namespace HelloServer
             };
         }
 
-
-        protected override void ChannelRead0(IChannelHandlerContext ctx, RequestPacket msg)
+        public override void ChannelRead(IChannelHandlerContext ctx, object msg)
         {
-            var ps = test.ReadFrom(msg);
-            var ret =  test.Method.Invoke(this, ps) as Task<string>;
-            ret.ContinueWith(i => 
+            if (msg is RequestPacket m)
             {
-                ctx.WriteAndFlushAsync(i.Result);
-                Console.WriteLine(i.Result);
-            });
+                var ps = test.ReadFrom(m);
+                var ret = test.Method.Invoke(this, ps) as Task<string>;
+                ctx.WriteAndFlushAsync(ret.Result);
+                Console.WriteLine(ret.Result);
+            }
+            else
+            {
+                var ret = test.Method.Invoke(this, new object[] { 33, "die" }) as Task<string>;
+                var bytes = Encoding.UTF8.GetBytes(ret.Result);
+                IByteBuffer buffer = Unpooled.WrappedBuffer(bytes);
+                ctx.WriteAndFlushAsync(buffer);
+                Console.WriteLine(ret.Result);
+            }
+            //ret.ContinueWith(i =>
+            //{
+            //    ctx.WriteAndFlushAsync(i.Result);
+            //    Console.WriteLine(i.Result);
+            //});
         }
     }
 }

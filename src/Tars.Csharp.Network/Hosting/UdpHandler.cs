@@ -1,13 +1,31 @@
-﻿using DotNetty.Transport.Channels;
+﻿using System.Threading.Tasks;
+using DotNetty.Common.Utilities;
+using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
+using System.Net;
+using DotNetty.Buffers;
 
 namespace Tars.Csharp.Network.Hosting
 {
-    public class UdpHandler : SimpleChannelInboundHandler<DatagramPacket>
+    public class UdpHandler : Handler
     {
-        protected override void ChannelRead0(IChannelHandlerContext ctx, DatagramPacket msg)
+        private EndPoint endPoint;
+        public override void ChannelRead(IChannelHandlerContext ctx, object msg)
         {
-            ctx.FireChannelRead(msg.Content);
+            if (msg is DatagramPacket packet)
+            {
+                endPoint = packet.Sender;
+                ctx.FireChannelRead(packet.Content);
+            }
+            else
+            {
+                ReferenceCountUtil.Release(msg);
+            }
+        }
+
+        public override Task WriteAsync(IChannelHandlerContext context, object message)
+        {
+            return base.WriteAsync(context, new DatagramPacket(message as IByteBuffer, endPoint));
         }
     }
 }
