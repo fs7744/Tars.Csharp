@@ -6,9 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Network.Hosting;
+using Tars.Csharp.Rpc.Protocol;
 
 namespace HelloServer
 {
@@ -35,13 +38,50 @@ namespace HelloServer
                 .Build()
                 .Run();
         }
+
     }
 
     public class TestHandler : SimpleChannelInboundHandler<RequestPacket>
     {
+        public Task<string> Hello(int no, string name)
+        {
+            return Task.FromResult($"Hi, {no}, your name is {name}.");
+        }
+
+        private TarsMethodInfo test;
+        public TestHandler()
+        {
+            test = new TarsMethodInfo()
+            {
+                Method = this.GetType().GetMethod("Hello"),
+                Parameters = new List<TarsMethodParameterInfo>()
+                {
+                     new TarsMethodParameterInfo()
+                     {
+                          Name = "no",
+                          Order = 1,
+                          Stamp = 0
+                     },
+                     new TarsMethodParameterInfo()
+                     {
+                          Name = "name",
+                          Order = 2,
+                          Stamp = ""
+                     }
+                }
+            };
+        }
+
+
         protected override void ChannelRead0(IChannelHandlerContext ctx, RequestPacket msg)
         {
-            Console.WriteLine(msg.FuncName);
+            var ps = test.ReadFrom(msg);
+            var ret =  test.Method.Invoke(this, ps) as Task<string>;
+            ret.ContinueWith(i => 
+            {
+                ctx.WriteAndFlushAsync(i.Result);
+                Console.WriteLine(i.Result);
+            });
         }
     }
 }

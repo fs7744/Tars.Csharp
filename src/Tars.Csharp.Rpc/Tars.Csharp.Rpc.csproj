@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Tars.Csharp.Codecs\Tars.Csharp.Codecs.csproj" />
     <ProjectReference Include="..\Tars.Csharp.Network\Tars.Csharp.Network.csproj" />
   </ItemGroup>
 
