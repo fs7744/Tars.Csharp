@@ -11,7 +11,7 @@ Tars.Csharp 是 https://github.com/Tencent/Tars 的 dotnet 版本
 目前项目处于刚起步阶段，暂未完善
 
 初期目标如下：
-[] Tars rpc request and response 简单解析 (ing...)
-[] Tars rpc server 
-[] Tars rpc client
+- [ ] Tars rpc request and response 简单解析 (ing...)
+- [ ] Tars rpc server 
+- [ ] Tars rpc client
 
