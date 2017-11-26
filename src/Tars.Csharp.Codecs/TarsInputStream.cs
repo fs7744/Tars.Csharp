@@ -37,10 +37,6 @@ namespace Tars.Csharp.Codecs
             buffer = input;
         }
 
-        public TarsInputStream(byte[] bytes) : this(Unpooled.WrappedBuffer(bytes))
-        {
-        }
-
         /// <summary>
         /// 读取数据头
         /// </summary>
@@ -1064,7 +1060,7 @@ namespace Tars.Csharp.Codecs
             return null;
         }
 
-        public List<T> readArray<T>(List<T> l, int tag, bool isRequire)
+        public List<T> ReadArray<T>(List<T> l, int tag, bool isRequire)
         {
             // 生成代码时已经往List里面添加了一个元素，纯粹用来作为类型识别，否则java无法识别到List里面放的是什么类型的数据
             if (l == null || l.Count == 0)

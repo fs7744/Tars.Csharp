@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tars.Csharp.Core.Protocol.Tars.Exceptions
+namespace Tars.Csharp.Codecs
 {
     public class TarsEncodeException : Exception
     {

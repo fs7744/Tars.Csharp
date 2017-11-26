@@ -1,107 +1,48 @@
-﻿/**
- * Tencent is pleased to support the open source community by making Tars available.
- *
- * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
- * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except 
- * in compliance with the License. You may obtain a copy of the License at
- *
- * https://opensource.org/licenses/BSD-3-Clause
- *
- * Unless required by applicable law or agreed to in writing, software distributed 
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
- * CONDITIONS OF ANY KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations under the License.
- */
-
-
+﻿using DotNetty.Buffers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
-using Tars.Csharp.Core.Protocol.Tars.Exceptions;
-using Tars.Csharp.Core.Protocol.Util;
+using Tars.Csharp.Codecs.Util;
 
-namespace Tars.Csharp.Core.Protocol
+namespace Tars.Csharp.Codecs
 {
     public class TarsOutputStream
     {
-        private MemoryStream ms;
-        private BinaryWriter bw;
+        private IByteBuffer buf;
 
-        public TarsOutputStream(MemoryStream ms)
+        public TarsOutputStream(IByteBuffer buf)
         {
-            this.ms = ms;
-            bw = new BinaryWriter(ms, Encoding.BigEndianUnicode);
+            this.buf = buf;
         }
 
-        public TarsOutputStream(int capacity)
+        public byte[] ToByteArray()
         {
-            ms = new MemoryStream(capacity);
-            bw = new BinaryWriter(ms, Encoding.BigEndianUnicode);
-        }
-
-        public TarsOutputStream()
-        {
-            ms = new MemoryStream(128);
-            bw = new BinaryWriter(ms, Encoding.BigEndianUnicode);
-        }
-
-        public MemoryStream GetMemoryStream()
-        {
-            return ms;
-        }
-
-        public Byte[] ToByteArray()
-        {
-            Byte[] newBytes = new Byte[ms.Position];
-            System.Array.Copy(ms.GetBuffer(), 0, newBytes, 0, (int)ms.Position);
+            byte[] newBytes = new byte[buf.WriterIndex + 1];
+            buf.SetReaderIndex(0);
+            buf.ReadBytes(newBytes, 0, newBytes.Length);
+            buf.SetReaderIndex(0);
             return newBytes;
         }
 
         public void Reserve(int len)
         {
-            int nRemain = ms.Capacity - (int)ms.Length;
-            if (nRemain < len)
-            {
-                ms.Capacity = (ms.Capacity + len) << 1;// -nRemain;
-            }
+            buf.EnsureWritable(len, true);
         }
 
         // 写入头信息
-        public void WriteHead(Byte type, int tag)
+        public void WriteHead(byte type, int tag)
         {
             if (tag < 15)
             {
-                Byte b = (Byte)((tag << 4) | type);
-
-                try
-                {
-                    {
-                        bw.Write(b);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
-
+                byte b = (byte)((tag << 4) | type);
+                buf.WriteByte(b);
             }
             else if (tag < 256)
             {
-                try
-                {
-                    Byte b = (Byte)((15 << 4) | type);
-                    {
-                        bw.Write(b);
-                        bw.Write((Byte)tag);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(this + " writeHead: " + e.Message);
-                }
+                byte b = (byte)((15 << 4) | type);
+                buf.WriteByte(b);
+                buf.WriteByte(tag);
             }
             else
             {
@@ -111,30 +52,21 @@ namespace Tars.Csharp.Core.Protocol
 
         public void Write(bool b, int tag)
         {
-            Byte by = (Byte)(b ? 0x01 : 0);
+            byte by = (byte)(b ? 0x01 : 0);
             Write(by, tag);
         }
 
-        public void Write(Byte b, int tag)
+        public void Write(byte b, int tag)
         {
             Reserve(3);
             if (b == 0)
             {
-                WriteHead((Byte)TarsStructType.ZeroTag, tag);
+                WriteHead((byte)TarsStructType.ZeroTag, tag);
             }
             else
             {
-                WriteHead((Byte)TarsStructType.Byte, tag);
-                try
-                {
-                    {
-                        bw.Write(b);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.Byte, tag);
+                buf.WriteByte(b);
             }
         }
 
@@ -143,23 +75,15 @@ namespace Tars.Csharp.Core.Protocol
             Reserve(4);
             if (n >= -128 && n <= 127)
             {
-                Write((Byte)n, tag);
+                Write((byte)n, tag);
             }
             else
             {
-                WriteHead((Byte)TarsStructType.Short, tag);
-                try
-                {
-                    {
-                        bw.Write(ByteConverter.ReverseEndian(n));
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(this + " Write: " + e.Message);
-                }
+                WriteHead((byte)TarsStructType.Short, tag);
+                buf.WriteShort(n);
             }
         }
+
         public void Write(ushort n, int tag)
         {
             Write((short)n, tag);
@@ -175,17 +99,8 @@ namespace Tars.Csharp.Core.Protocol
             }
             else
             {
-                WriteHead((Byte)TarsStructType.Int, tag);
-                try
-                {
-                    {
-                        bw.Write(ByteConverter.ReverseEndian(n));
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.Int, tag);
+                buf.WriteInt(n);
             }
         }
 
@@ -208,189 +123,86 @@ namespace Tars.Csharp.Core.Protocol
             }
             else
             {
-                WriteHead((Byte)TarsStructType.Long, tag);
-                try
-                {
-                    {
-                        bw.Write(ByteConverter.ReverseEndian(n));
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.Long, tag);
+                buf.WriteLong(n);
             }
         }
 
         public void Write(float n, int tag)
         {
             Reserve(6);
-            WriteHead((Byte)TarsStructType.Float, tag);
-            try
-            {
-                {
-                    bw.Write(ByteConverter.ReverseEndian(n));
-                }
-            }
-            catch (Exception e)
-            {
-                QTrace.Trace(e.Message);
-            }
+            WriteHead((byte)TarsStructType.Float, tag);
+            buf.WriteFloat(n);
         }
 
         public void Write(double n, int tag)
         {
             Reserve(10);
-            WriteHead((Byte)TarsStructType.Double, tag);
-            try
-            {
-                {
-                    bw.Write(ByteConverter.ReverseEndian(n));
-                }
-            }
-            catch (Exception e)
-            {
-                QTrace.Trace(e.Message);
-            }
+            WriteHead((byte)TarsStructType.Double, tag);
+            buf.WriteDouble(n);
         }
 
         public void WriteStringByte(string s, int tag)
         {
-            Byte[] by = HexUtil.hexStr2Bytes(s);
+            byte[] by = HexUtil.HexStr2Bytes(s);
             Reserve(10 + by.Length);
             if (by.Length > 255)
             {
                 // 长度大于255，为String4类型
-                WriteHead((Byte)TarsStructType.String4, tag);
-                try
-                {
-                    {
-                        bw.Write(ByteConverter.ReverseEndian(by.Length));
-                        bw.Write(by);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.String4, tag);
+                buf.WriteInt(by.Length);
+                buf.WriteBytes(by);
             }
             else
             {
                 // 长度小于255，位String1类型
-                WriteHead((Byte)TarsStructType.String1, tag);
-                try
-                {
-                    {
-                        bw.Write((Byte)by.Length);
-                        bw.Write(by);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.String1, tag);
+                buf.WriteByte(by.Length);
+                buf.WriteBytes(by);
             }
         }
 
         public void WriteByteString(string s, int tag)
         {
             Reserve(10 + s.Length);
-            Byte[] by = HexUtil.hexStr2Bytes(s);
+            byte[] by = HexUtil.HexStr2Bytes(s);
             if (by.Length > 255)
             {
-                WriteHead((Byte)TarsStructType.String4, tag);
-                try
-                {
-                    {
-                        bw.Write(ByteConverter.ReverseEndian(by.Length));
-                        bw.Write(by);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.String4, tag);
+                buf.WriteInt(by.Length);
+                buf.WriteBytes(by);
             }
             else
             {
-                WriteHead((Byte)TarsStructType.String1, tag);
-                try
-                {
-                    {
-                        bw.Write((Byte)by.Length);
-                        bw.Write(by);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.String1, tag);
+                buf.WriteByte(by.Length);
+                buf.WriteBytes(by);
             }
         }
 
         public void Write(string s, int tag, bool IsLocalString = false)
         {
-            Byte[] by;
-            try
+            byte[] by;
+            by = Encoding.GetEncoding(sServerEncoding).GetBytes(s);
+            Reserve(10 + by.Length);
+            if (by.Length > 255)
             {
-                by = ByteConverter.String2Bytes(s, IsLocalString);
-                if (by == null)
-                {
-                    by = new Byte[0];
-                }
-            }
-            catch (Exception e)
-            {
-                QTrace.Trace(e.Message);
-                return;
-            }
-            if (by != null)
-            {
-                Reserve(10 + by.Length);
-            }
-            if (by != null && by.Length > 255)
-            {
-                WriteHead((Byte)TarsStructType.String4, tag);
-                try
-                {
-                    {
-                        bw.Write(ByteConverter.ReverseEndian(by.Length));
-                        bw.Write(by);
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.String4, tag);
+                buf.WriteInt(by.Length);
+                buf.WriteBytes(by);
             }
             else
             {
-                WriteHead((Byte)TarsStructType.String1, tag);
-                try
-                {
-                    {
-                        if (by != null)
-                        {
-                            bw.Write((Byte)by.Length);
-                            bw.Write(by);
-                        }
-                        else
-                        {
-                            bw.Write((Byte)0);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    QTrace.Trace(e.Message);
-                }
+                WriteHead((byte)TarsStructType.String1, tag);
+                buf.WriteByte(by.Length);
+                buf.WriteBytes(by);
             }
         }
 
-        public void Write<K, V>(Dictionary<K, V> m, int tag)
+        public void Write<K, V>(IDictionary<K, V> m, int tag)
         {
             Reserve(8);
-            WriteHead((Byte)TarsStructType.Map, tag);
+            WriteHead((byte)TarsStructType.Map, tag);
 
             Write(m == null ? 0 : m.Count, 0);
             if (m != null)
@@ -406,7 +218,7 @@ namespace Tars.Csharp.Core.Protocol
         public void Write(IDictionary m, int tag)
         {
             Reserve(8);
-            WriteHead((Byte)TarsStructType.Map, tag);
+            WriteHead((byte)TarsStructType.Map, tag);
             Write(m == null ? 0 : m.Count, 0);
             if (m != null)
             {
@@ -427,7 +239,7 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(nLen, 0);
 
             if (l != null)
@@ -439,7 +251,7 @@ namespace Tars.Csharp.Core.Protocol
             }
         }
 
-        public void Write(Byte[] l, int tag)
+        public void Write(byte[] l, int tag)
         {
             int nLen = 0;
             if (l != null)
@@ -447,20 +259,12 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8 + nLen);
-            WriteHead((Byte)TarsStructType.SimpleList, tag);
-            WriteHead((Byte)TarsStructType.Byte, 0);
+            WriteHead((byte)TarsStructType.SimpleList, tag);
+            WriteHead((byte)TarsStructType.Byte, 0);
             Write(nLen, 0);
-
-            try
+            if (l != null)
             {
-                if (l != null)
-                {
-                    bw.Write(l);
-                }
-            }
-            catch (Exception e)
-            {
-                QTrace.Trace(e.Message);
+                buf.WriteBytes(l);
             }
         }
 
@@ -472,7 +276,7 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(nLen, 0);
             if (l != null)
             {
@@ -491,7 +295,7 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(nLen, 0);
             if (l != null)
             {
@@ -510,7 +314,7 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(nLen, 0);
 
             if (l != null)
@@ -530,7 +334,7 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(nLen, 0);
             if (l != null)
             {
@@ -549,7 +353,7 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(nLen, 0);
 
             if (l != null)
@@ -575,7 +379,7 @@ namespace Tars.Csharp.Core.Protocol
                 nLen = l.Length;
             }
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(nLen, 0);
 
             if (l != null)
@@ -591,7 +395,7 @@ namespace Tars.Csharp.Core.Protocol
         public void WriteList(IList l, int tag)
         {
             Reserve(8);
-            WriteHead((Byte)TarsStructType.List, tag);
+            WriteHead((byte)TarsStructType.List, tag);
             Write(l == null ? 0 : (l.Count > 0 ? l.Count : 0), 0);
             if (l != null)
             {
@@ -602,17 +406,17 @@ namespace Tars.Csharp.Core.Protocol
             }
         }
 
-        public void Write(TarsStructBase o, int tag)
+        public void Write(TarsStruct o, int tag)
         {
             if (o == null)
             {
                 return;
             }
             Reserve(2);
-            WriteHead((Byte)TarsStructType.StructBegin, tag);
+            WriteHead((byte)TarsStructType.StructBegin, tag);
             o.WriteTo(this);
             Reserve(2);
-            WriteHead((Byte)TarsStructType.StructEnd, 0);
+            WriteHead((byte)TarsStructType.StructEnd, 0);
         }
 
         public void Write(object o, int tag)
@@ -621,9 +425,9 @@ namespace Tars.Csharp.Core.Protocol
             {
                 return;
             }
-            if (o is Byte)
+            if (o is byte)
             {
-                Write(((Byte)o), tag);
+                Write(((byte)o), tag);
             }
             else if (o is Boolean)
             {
@@ -666,13 +470,13 @@ namespace Tars.Csharp.Core.Protocol
                 string strObj = o as string;
                 Write(strObj, tag);
             }
-            else if (o is TarsStructBase)
+            else if (o is TarsStruct)
             {
-                Write((TarsStructBase)o, tag);
+                Write((TarsStruct)o, tag);
             }
-            else if (o is Byte[])
+            else if (o is byte[])
             {
-                Write((Byte[])o, tag);
+                Write((byte[])o, tag);
             }
             else if (o is bool[])
             {
@@ -718,6 +522,7 @@ namespace Tars.Csharp.Core.Protocol
         }
 
         protected string sServerEncoding = "UTF-8";
+
         public int SetServerEncoding(string se)
         {
             sServerEncoding = se;

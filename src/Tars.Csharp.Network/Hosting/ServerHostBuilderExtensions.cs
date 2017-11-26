@@ -1,5 +1,4 @@
 ﻿using DotNetty.Transport.Channels;
-using DotNetty.Transport.Channels.Sockets;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 

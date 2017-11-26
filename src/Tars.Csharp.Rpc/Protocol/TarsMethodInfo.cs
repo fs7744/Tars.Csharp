@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DotNetty.Buffers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Tars.Csharp.Codecs;
@@ -32,33 +33,43 @@ namespace Tars.Csharp.Rpc.Protocol
             //    throw new ProtocolException("no found methodInfo, the context[ROOT], serviceName[" + servantName + "], methodName[" + methodName + "]");
             //}
 
-            var stream = new TarsInputStream(request.Buffer);
-            UniAttribute unaIn;
+
+            var buf = Unpooled.WrappedBuffer(request.Buffer);
             object[] ps = null;
-            switch (request.Version)
+            try
             {
-                case 0x01:
-                    ps = DecodeRequestBody(stream);
-                    break;
+                var stream = new TarsInputStream(buf);
+                UniAttribute unaIn;
+                switch (request.Version)
+                {
+                    case 0x01:
+                        ps = DecodeRequestBody(stream);
+                        break;
 
-                case 0x02:
-                    unaIn = new UniAttribute();
-                    //unaIn.setEncodeName(request.getCharsetName());
-                    unaIn.DecodeTup2(stream);
-                    ps = CreateParameters(unaIn, stream);
-                    break;
+                    case 0x02:
+                        unaIn = new UniAttribute();
+                        //unaIn.setEncodeName(request.getCharsetName());
+                        unaIn.DecodeTup2(stream);
+                        ps = CreateParameters(unaIn, stream);
+                        break;
 
-                case 0x03:
-                    unaIn = new UniAttribute();
-                    //unaIn.setEncodeName(request.getCharsetName());
-                    unaIn.DecodeTup3(stream);
-                    ps = CreateParameters(unaIn, stream);
-                    break;
+                    case 0x03:
+                        unaIn = new UniAttribute();
+                        //unaIn.setEncodeName(request.getCharsetName());
+                        unaIn.DecodeTup3(stream);
+                        ps = CreateParameters(unaIn, stream);
+                        break;
 
-                default:
-                    //request.setRet(TarsHelper.SERVERDECODEERR);
-                    break;
+                    default:
+                        //request.setRet(TarsHelper.SERVERDECODEERR);
+                        break;
+                }
             }
+            finally
+            {
+                buf.Release();
+            }
+            
             return ps;
         }
 

@@ -40,18 +40,18 @@ namespace Tars.Csharp.Codecs.Tup
             Status = inputStream.ReadMap<string, string>(new Dictionary<string, string>(), 10, true);
         }
 
-        //public override void WriteTo(TarsOutputStream outputStream)
-        //{
-        //    outputStream.Write(Version, 1);
-        //    outputStream.Write(PacketType, 2);
-        //    outputStream.Write(MessageType, 3);
-        //    outputStream.Write(RequestId, 4);
-        //    outputStream.Write(ServantName, 5);
-        //    outputStream.Write(FuncName, 6);
-        //    outputStream.Write(Buffer, 7);
-        //    outputStream.Write(Timeout, 8);
-        //    outputStream.Write(Context, 9);
-        //    outputStream.Write(Status, 10);
-        //}
+        public override void WriteTo(TarsOutputStream outputStream)
+        {
+            outputStream.Write(Version, 1);
+            outputStream.Write(PacketType, 2);
+            outputStream.Write(MessageType, 3);
+            outputStream.Write(RequestId, 4);
+            outputStream.Write(ServantName, 5);
+            outputStream.Write(FuncName, 6);
+            outputStream.Write(Buffer, 7);
+            outputStream.Write(Timeout, 8);
+            outputStream.Write(Context, 9);
+            outputStream.Write(Status, 10);
+        }
     }
 }

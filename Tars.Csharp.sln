@@ -3,17 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tars.Csharp.Core.Protocol", "src\Core\Tars.Csharp.Core.Protocol\Tars.Csharp.Core.Protocol.csproj", "{E4E3E97E-0217-4830-9647-C24C0EC2C91C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tars.Csharp.Net", "src\Net\Tars.Csharp.Net\Tars.Csharp.Net.csproj", "{9CDB9345-2124-4B96-B1ED-C83B772F02AA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloServer", "exapmles\HelloServer\HelloServer.csproj", "{A49E769E-1BBE-455E-B0C3-63EF4F95AA90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tars.Csharp.Network", "src\Tars.Csharp.Network\Tars.Csharp.Network.csproj", "{5450D0FE-2724-41C2-B8EF-F5C2201AE833}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tars.Csharp.Network", "src\Tars.Csharp.Network\Tars.Csharp.Network.csproj", "{5450D0FE-2724-41C2-B8EF-F5C2201AE833}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tars.Csharp.Codecs", "src\Tars.Csharp.Codecs\Tars.Csharp.Codecs.csproj", "{48B1C005-3FC6-48F3-BF4A-CAC2E2A8B9A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tars.Csharp.Codecs", "src\Tars.Csharp.Codecs\Tars.Csharp.Codecs.csproj", "{48B1C005-3FC6-48F3-BF4A-CAC2E2A8B9A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tars.Csharp.Rpc", "src\Tars.Csharp.Rpc\Tars.Csharp.Rpc.csproj", "{64A19FF3-E5B9-468A-9E41-C22C0A369C62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tars.Csharp.Rpc", "src\Tars.Csharp.Rpc\Tars.Csharp.Rpc.csproj", "{64A19FF3-E5B9-468A-9E41-C22C0A369C62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,14 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E4E3E97E-0217-4830-9647-C24C0EC2C91C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4E3E97E-0217-4830-9647-C24C0EC2C91C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4E3E97E-0217-4830-9647-C24C0EC2C91C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4E3E97E-0217-4830-9647-C24C0EC2C91C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9CDB9345-2124-4B96-B1ED-C83B772F02AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9CDB9345-2124-4B96-B1ED-C83B772F02AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9CDB9345-2124-4B96-B1ED-C83B772F02AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9CDB9345-2124-4B96-B1ED-C83B772F02AA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A49E769E-1BBE-455E-B0C3-63EF4F95AA90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A49E769E-1BBE-455E-B0C3-63EF4F95AA90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A49E769E-1BBE-455E-B0C3-63EF4F95AA90}.Release|Any CPU.ActiveCfg = Release|Any CPU

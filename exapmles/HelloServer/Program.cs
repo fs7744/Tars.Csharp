@@ -1,5 +1,4 @@
 ﻿using DotNetty.Buffers;
-using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Network.Hosting;
 using Tars.Csharp.Rpc.Protocol;
@@ -26,14 +24,14 @@ namespace HelloServer
 
             new ServerHostBuilder()
                 .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
-                .ConfigureServices(i => i.AddLogging(j => j.AddConsole()))
+                .ConfigureServices(i => i.AddLogging(j => j.AddConsole().SetMinimumLevel(LogLevel.Trace)))
                 .UseTcp((i, j) =>
                 {
                     //var config = i.GetRequiredService<IConfigurationRoot>();
                     //var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
                     //j.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, packetMaxSize, 0, 4, -4, 0, true));
                     //j.AddLast(new TarsDecoder());
-                    j.AddLast(new TestHandler());
+                    j.AddLast(new LoggingHandler(i.GetRequiredService<ILogger<LoggingHandler>>()), new TestHandler());
                 })
                 .Build()
                 .Run();

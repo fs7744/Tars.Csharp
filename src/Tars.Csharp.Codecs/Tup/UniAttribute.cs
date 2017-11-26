@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetty.Buffers;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Tars.Csharp.Codecs.Util;
@@ -67,67 +68,78 @@ namespace Tars.Csharp.Codecs.Tup
             }
         }
 
-        //public override void WriteTo(TarsOutputStream outputStream)
-        //{
-        //    if (IsPacketTypeTup3)
-        //    {
-        //        outputStream.Write(newData, 0);
-        //    }
-        //    else
-        //    {
-        //        outputStream.Write(data, 0);
-        //    }
-        //}
+        public override void WriteTo(TarsOutputStream outputStream)
+        {
+            if (IsPacketTypeTup3)
+            {
+                outputStream.Write<string, byte[]>(newData, 0);
+            }
+            else
+            {
+                outputStream.Write<string, Dictionary<string, byte[]>>(data, 0);
+            }
+        }
 
-        //public void Put<T>(string name, T t)
-        //{
-        //    if (name == null)
-        //    {
-        //        throw new ArgumentException("put key can not is null");
-        //    }
-        //    if (t == null)
-        //    {
-        //        throw new ArgumentException("put value can not is null");
-        //    }
+        public void Put<T>(string name, T t)
+        {
+            if (name == null)
+            {
+                throw new ArgumentException("put key can not is null");
+            }
+            if (t == null)
+            {
+                throw new ArgumentException("put value can not is null");
+            }
 
-        //    TarsOutputStream _out = new TarsOutputStream();
-        //    _out.SetServerEncoding(EncodeName);
-        //    _out.Write(t, 0);
-        //    byte[] sBuffer = TarsUtil.GetTarsBufArray(_out.GetMemoryStream());
+            var buf = Unpooled.Buffer(128);
+            byte[] sBuffer = null;
+            try
+            {
+                TarsOutputStream _out = new TarsOutputStream(buf);
+                _out.SetServerEncoding(EncodeName);
+                _out.Write(t, 0);
+                sBuffer = _out.ToByteArray();
+            }
+            finally
+            {
+                buf.Release();
+            }
 
-        //    if (IsPacketTypeTup3)
-        //    {
-        //        cachedData.Remove(name);
+            if (IsPacketTypeTup3)
+            {
+                cachedData.Remove(name);
 
-        //        if (newData.ContainsKey(name))
-        //        {
-        //            newData[name] = sBuffer;
-        //        }
-        //        else
-        //        {
-        //            newData.Add(name, sBuffer);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        List<string> listType = new List<string>();
-        //        CheckObjectType(listType, t);
-        //        string className = BasicClassTypeUtil.TransTypeList(listType);
+                if (newData.ContainsKey(name))
+                {
+                    newData[name] = sBuffer;
+                }
+                else
+                {
+                    newData.Add(name, sBuffer);
+                }
+            }
+            else
+            {
+                List<string> listType = new List<string>();
+                CheckObjectType(listType, t);
+                string className = BasicClassTypeUtil.TransTypeList(listType);
 
-        //        Dictionary<string, byte[]> pair = new Dictionary<string, byte[]>(1);
-        //        pair.Add(className, sBuffer);
-        //        cachedData.Remove(name);
+                Dictionary<string, byte[]> pair = new Dictionary<string, byte[]>(1)
+                {
+                    { className, sBuffer }
+                };
+                cachedData.Remove(name);
 
-        //        if (data.ContainsKey(name))
-        //        {
-        //            data[name] = pair;
-        //        }
-        //        else
-        //        {
-        //            data.Add(name, pair);
-        //        }
-        //    }
-        //}
+                if (data.ContainsKey(name))
+                {
+                    data[name] = pair;
+                }
+                else
+                {
+                    data.Add(name, pair);
+                }
+            }
+        }
 
         private Object DecodeData(byte[] data, object proxy, TarsInputStream inputStream)
         {
@@ -215,8 +227,7 @@ namespace Tars.Csharp.Codecs.Tup
             }
             else
             {
-                Dictionary<string, byte[]> pair;
-                data.TryGetValue(name, out pair);
+                data.TryGetValue(name, out Dictionary<string, byte[]> pair);
 
                 string strBasicType = "";
                 string className = null;
@@ -292,7 +303,7 @@ namespace Tars.Csharp.Codecs.Tup
 
                 if (IsPacketTypeTup3)
                 {
-                    result = GetByClass<T>(Name, DefaultObj,  inputStream);
+                    result = GetByClass<T>(Name, DefaultObj, inputStream);
                 }
                 else //tup2
                 {
