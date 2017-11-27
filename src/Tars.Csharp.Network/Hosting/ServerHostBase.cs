@@ -48,11 +48,11 @@ namespace Tars.Csharp.Network.Hosting
             }
             finally
             {
-                await Stop(quietPeriod, timeout);
+                await StopAsync(quietPeriod, timeout);
             }
         }
 
-        protected abstract Task Stop(TimeSpan quietPeriod, TimeSpan timeout);
+        protected abstract Task StopAsync(TimeSpan quietPeriod, TimeSpan timeout);
 
         protected abstract Task<IChannel> BindAsync(IPEndPoint iPEndPoint, IChannelHandler initializer);
 

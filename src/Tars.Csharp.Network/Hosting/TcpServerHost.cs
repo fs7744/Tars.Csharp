@@ -32,7 +32,7 @@ namespace Tars.Csharp.Network.Hosting
             workerGroup = new MultithreadEventLoopGroup(eventLoopCount);
         }
 
-        protected override Task Stop(TimeSpan quietPeriod, TimeSpan timeout)
+        protected override Task StopAsync(TimeSpan quietPeriod, TimeSpan timeout)
         {
             return Task.WhenAll(
                     bossGroup.ShutdownGracefullyAsync(quietPeriod, timeout),

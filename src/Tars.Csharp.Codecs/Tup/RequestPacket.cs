@@ -46,7 +46,7 @@ namespace Tars.Csharp.Codecs.Tup
 
         public override void WriteTo(TarsOutputStream outputStream)
         {
-            outputStream.PutZero();
+            //outputStream.PutZero();
             outputStream.Write(Version, 1);
             outputStream.Write(PacketType, 2);
             switch (Version)
@@ -85,7 +85,7 @@ namespace Tars.Csharp.Codecs.Tup
                 default:
                     break;
             }
-            outputStream.PutDataLength();
+            //outputStream.PutDataLength();
         }
     }
 }

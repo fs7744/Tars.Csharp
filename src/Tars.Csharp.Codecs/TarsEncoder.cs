@@ -14,7 +14,7 @@ namespace Tars.Csharp.Codecs
             var buf = Unpooled.Buffer(128);
             var outputStream = new TarsOutputStream(buf);
             message.WriteTo(outputStream);
-            output.Add(buf);
+            output.Add(buf.Slice());
         }
     }
 }

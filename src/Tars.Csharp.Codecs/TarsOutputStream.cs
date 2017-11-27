@@ -104,18 +104,18 @@ namespace Tars.Csharp.Codecs
             }
         }
 
-        public void PutZero()
-        {
-            buf.WriteInt(0);
-        }
+        //public void PutZero()
+        //{
+        //    buf.WriteInt(0);
+        //}
 
-        public void PutDataLength()
-        {
-            var len = buf.WriterIndex;
-            buf.SetWriterIndex(0);
-            buf.WriteInt(len);
-            buf.SetWriterIndex(len);
-        }
+        //public void PutDataLength()
+        //{
+        //    var len = buf.WriterIndex;
+        //    buf.SetWriterIndex(0);
+        //    buf.WriteInt(len);
+        //    buf.SetWriterIndex(len);
+        //}
 
         public void Write(uint n, int tag)
         {

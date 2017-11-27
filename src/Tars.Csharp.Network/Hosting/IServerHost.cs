@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Tars.Csharp.Network.Hosting
 {
