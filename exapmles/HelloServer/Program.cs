@@ -20,12 +20,12 @@ namespace HelloServer
     [Rpc(Codec = Codec.Tars)]
     public interface IHelloRpc
     {
-        ValueTask<string> Hello(int no, string name);
+        Task<string> Hello(int no, string name);
     }
 
     public class HelloServer : IHelloRpc
     {
-        public async ValueTask<string> Hello(int no, string name)
+        public async Task<string> Hello(int no, string name)
         {
             if (name.Trim().ToLower() == "Victor")
             {

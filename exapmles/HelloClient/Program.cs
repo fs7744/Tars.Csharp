@@ -17,7 +17,7 @@ namespace HelloClient
         private static async Task Run()
         {
             var service = new ServiceCollection()
-                .AddSingleton<IClientFactory, SimpleClientFactory>()
+                .UseSimpleClient()
                 .BuildServiceProvider();
 
             var factory = service.GetRequiredService<IClientFactory>();
