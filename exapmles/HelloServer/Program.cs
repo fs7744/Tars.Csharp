@@ -11,10 +11,34 @@ using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Network.Hosting;
+using Tars.Csharp.Rpc;
+using Tars.Csharp.Rpc.Attributes;
 using Tars.Csharp.Rpc.Protocol;
 
 namespace HelloServer
 {
+    [Rpc(Codec = Codec.Tars)]
+    public interface IHelloRpc
+    {
+        ValueTask<string> Hello(int no, string name);
+    }
+
+    public class HelloServer : IHelloRpc
+    {
+        public async ValueTask<string> Hello(int no, string name)
+        {
+            if (name.Trim().ToLower() == "Victor")
+            {
+                await Task.Delay(5000);
+                return $"{no}: Sorry, {name}";
+            }
+            else
+            {
+                return $"{no}: Hi, {name}";
+            }
+        }
+    }
+
     public class Program
     {
         private static void Main(string[] args)
@@ -27,6 +51,7 @@ namespace HelloServer
             new ServerHostBuilder()
                 .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
                 .ConfigureServices(i => i.AddLogging(j => j.AddConsole().SetMinimumLevel(LogLevel.Trace)))
+                .UseRpc(typeof(Program).Assembly, RpcMode.Tcp)
                 .UseLibuvTcp((i, j) =>
                 {
                     var config = i.GetRequiredService<IConfigurationRoot>();
@@ -110,17 +135,17 @@ namespace HelloServer
 
     public class TLengthFieldBasedFrameDecoder : ByteToMessageDecoder
     {
-        readonly ByteOrder byteOrder;
-        readonly int maxFrameLength;
-        readonly int lengthFieldOffset;
-        readonly int lengthFieldLength;
-        readonly int lengthFieldEndOffset;
-        readonly int lengthAdjustment;
-        readonly int initialBytesToStrip;
-        readonly bool failFast;
-        bool discardingTooLongFrame;
-        long tooLongFrameLength;
-        long bytesToDiscard;
+        private readonly ByteOrder byteOrder;
+        private readonly int maxFrameLength;
+        private readonly int lengthFieldOffset;
+        private readonly int lengthFieldLength;
+        private readonly int lengthFieldEndOffset;
+        private readonly int lengthAdjustment;
+        private readonly int initialBytesToStrip;
+        private readonly bool failFast;
+        private bool discardingTooLongFrame;
+        private long tooLongFrameLength;
+        private long bytesToDiscard;
 
         /// <summary>
         ///     Create a new instance.
@@ -345,15 +370,19 @@ namespace HelloServer
                 case 1:
                     frameLength = buffer.GetByte(offset);
                     break;
+
                 case 2:
                     frameLength = this.byteOrder == ByteOrder.BigEndian ? buffer.GetShort(offset) : buffer.GetShortLE(offset);
                     break;
+
                 case 4:
                     frameLength = this.byteOrder == ByteOrder.BigEndian ? buffer.GetInt(offset) : buffer.GetIntLE(offset);
                     break;
+
                 case 8:
                     frameLength = this.byteOrder == ByteOrder.BigEndian ? buffer.GetLong(offset) : buffer.GetLongLE(offset);
                     break;
+
                 default:
                     throw new DecoderException("unsupported lengthFieldLength: " + this.lengthFieldLength + " (expected: 1, 2, 3, 4, or 8)");
             }
@@ -367,7 +396,7 @@ namespace HelloServer
             return buff;
         }
 
-        void FailIfNecessary(bool firstDetectionOfTooLongFrame)
+        private void FailIfNecessary(bool firstDetectionOfTooLongFrame)
         {
             if (this.bytesToDiscard == 0)
             {
@@ -392,7 +421,7 @@ namespace HelloServer
             }
         }
 
-        void Fail(long frameLength)
+        private void Fail(long frameLength)
         {
             if (frameLength > 0)
             {

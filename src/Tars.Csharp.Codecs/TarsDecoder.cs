@@ -38,10 +38,8 @@ namespace Tars.Csharp.Codecs
 
     public class TarsDecoder : ByteToMessageDecoder
     {
-
         protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
         {
-            //if (input.ReadableBytes < 1) return;
             var inputStream = new TarsInputStream(input);
             while (input.IsReadable())
             {

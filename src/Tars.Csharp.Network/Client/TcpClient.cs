@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Tars.Csharp.Network.Client
 {
-    public class TcpClient
-    {
-    }
+    //public class TcpClient
+    //{
+    //}
 }
