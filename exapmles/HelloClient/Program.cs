@@ -17,7 +17,8 @@ namespace HelloClient
         private static async Task Run()
         {
             var service = new ServiceCollection()
-                .UseSimpleClient()
+                .AddRpcProxy(typeof(Program).Assembly)
+                .UseSimpleRpcClient()
                 .BuildServiceProvider();
 
             var factory = service.GetRequiredService<IRpcClientFactory>();
