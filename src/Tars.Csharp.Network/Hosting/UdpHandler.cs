@@ -1,15 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using DotNetty.Buffers;
 using DotNetty.Common.Utilities;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using System.Net;
-using DotNetty.Buffers;
+using System.Threading.Tasks;
 
 namespace Tars.Csharp.Network.Hosting
 {
     public class UdpHandler : Handler
     {
         private EndPoint endPoint;
+
         public override void ChannelRead(IChannelHandlerContext ctx, object msg)
         {
             if (msg is DatagramPacket packet)

@@ -33,7 +33,6 @@ namespace Tars.Csharp.Rpc.Protocol
             //    throw new ProtocolException("no found methodInfo, the context[ROOT], serviceName[" + servantName + "], methodName[" + methodName + "]");
             //}
 
-
             var buf = Unpooled.WrappedBuffer(request.Buffer);
             object[] ps = null;
             try
@@ -69,7 +68,7 @@ namespace Tars.Csharp.Rpc.Protocol
             {
                 buf.Release();
             }
-            
+
             return ps;
         }
 

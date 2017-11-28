@@ -6,7 +6,7 @@ namespace Tars.Csharp.Rpc.Clients
     {
         public static IServiceCollection UseSimpleClient(this IServiceCollection service)
         {
-            return service.AddSingleton<IClientFactory, SimpleClientFactory>();
+            return service.AddSingleton<IRpcClientFactory, SimpleRpcClientFactory>();
         }
     }
 }

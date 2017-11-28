@@ -65,6 +65,7 @@ namespace Tars.Csharp.Codecs.Tup
                         outputStream.Write(ResultDesc ?? "", 8);
                     }
                     break;
+
                 case Const.Version2:
                 case Const.Version3:
                     outputStream.Write(MessageType, 3);
@@ -82,6 +83,7 @@ namespace Tars.Csharp.Codecs.Tup
                         outputStream.Write(Context, 10);
                     }
                     break;
+
                 default:
                     break;
             }

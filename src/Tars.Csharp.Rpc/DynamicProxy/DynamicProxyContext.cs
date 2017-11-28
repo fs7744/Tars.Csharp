@@ -1,11 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Tars.Csharp.Rpc.DynamicProxy
 {
-    public struct DynamicProxyContext
+    public class DynamicProxyContext
     {
+        public Func<DynamicProxyContext, string, object[], object> Invoke { get; set; }
 
+        public object InvokeProxy(DynamicProxyContext context, string methodName, object[] parameters)
+        {
+            return Invoke == null ? null : Invoke(context, methodName, parameters);
+        }
     }
 }

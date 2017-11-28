@@ -7,7 +7,7 @@ using Tars.Csharp.Rpc.Clients;
 
 namespace HelloClient
 {
-    internal class Program
+    public class Program
     {
         private static void Main(string[] args)
         {
@@ -20,8 +20,15 @@ namespace HelloClient
                 .UseSimpleClient()
                 .BuildServiceProvider();
 
-            var factory = service.GetRequiredService<IClientFactory>();
-            var proxy = factory.GetOrCreateProxy<IHelloRpc>("TestApp.HelloServer.HelloObj", RpcMode.Tcp, "127.0.0.1", 8989);
+            var factory = service.GetRequiredService<IRpcClientFactory>();
+            var context = new RpcContext()
+            {
+                Name = "TestApp.HelloServer.HelloObj",
+                Host = "127.0.0.1",
+                Port = 8989,
+                Mode = RpcMode.Tcp
+            };
+            var proxy = factory.CreateProxy<IHelloRpc>(context);
             Console.WriteLine(await proxy.Hello(1, "Victor"));
             await factory.ShutdownAsync();
         }
