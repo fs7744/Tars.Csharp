@@ -43,5 +43,7 @@
 
         public const byte Normal = 0x00;
         public const byte OneWay = 0x01;
+
+        public const string TarsCodec = "Tars";
     }
 }

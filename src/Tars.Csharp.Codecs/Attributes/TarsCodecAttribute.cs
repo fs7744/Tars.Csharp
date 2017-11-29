@@ -2,11 +2,13 @@
 using System;
 using Tars.Csharp.Codecs.Tup;
 
-namespace Tars.Csharp.Attributes
+namespace Tars.Csharp.Codecs.Attributes
 {
     public class TarsCodecAttribute : CodecAttribute
     {
-        public override object DecodeRequest(IByteBuffer input)
+        public override string Key => Const.TarsCodec;
+
+        public override RequestPacket DecodeRequest(IByteBuffer input)
         {
             var inputStream = new TarsInputStream(input);
             var result = new RequestPacket();
@@ -15,23 +17,21 @@ namespace Tars.Csharp.Attributes
             return result;
         }
 
-        public override object DecodeResponse(IByteBuffer input)
+        public override RequestPacket DecodeResponse(IByteBuffer input)
         {
             throw new NotImplementedException();
         }
 
-        public override IByteBuffer EncodeRequest(object request)
+        public override IByteBuffer EncodeRequest(RequestPacket request)
         {
             throw new NotImplementedException();
         }
 
-        public override IByteBuffer EncodeResponse(object response)
+        public override IByteBuffer EncodeResponse(RequestPacket response)
         {
-            var message = response as RequestPacket;
-            if (message == null || message.PacketType == Const.OneWay) return null;
             var buf = Unpooled.Buffer(128);
             var outputStream = new TarsOutputStream(buf);
-            message.WriteTo(outputStream);
+            response.WriteTo(outputStream);
             return buf.Slice();
         }
     }

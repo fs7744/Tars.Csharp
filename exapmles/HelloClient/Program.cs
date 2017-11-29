@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Net;
 using System.Threading.Tasks;
-using Tars.Csharp.Attributes;
+using Tars.Csharp.Codecs.Attributes;
 using Tars.Csharp.Rpc;
-using Tars.Csharp.Rpc.Attributes;
 using Tars.Csharp.Rpc.Clients;
 
 namespace HelloClient
@@ -26,8 +26,7 @@ namespace HelloClient
             var context = new RpcContext()
             {
                 Name = "TestApp.HelloServer.HelloObj",
-                Host = "127.0.0.1",
-                Port = 8989,
+                EndPoint = new DnsEndPoint("127.0.0.1", 8989),
                 Mode = RpcMode.Tcp
             };
             var proxy = factory.CreateProxy<IHelloRpc>(context);

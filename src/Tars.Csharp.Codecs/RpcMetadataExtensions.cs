@@ -4,9 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Tars.Csharp.Attributes;
 using Tars.Csharp.Codecs;
-using Tars.Csharp.Rpc.Attributes;
+using Tars.Csharp.Codecs.Attributes;
 
 namespace Tars.Csharp.Rpc
 {

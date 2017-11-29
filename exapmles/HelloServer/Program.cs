@@ -9,15 +9,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
+using Tars.Csharp.Codecs.Attributes;
 using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Network.Hosting;
 using Tars.Csharp.Rpc;
-using Tars.Csharp.Rpc.Attributes;
 using Tars.Csharp.Rpc.Protocol;
 
 namespace HelloServer
 {
-    [Rpc(Codec = Codec.Tars)]
+    [Rpc]
     public interface IHelloRpc
     {
         Task<string> Hello(int no, string name);
@@ -58,7 +58,7 @@ namespace HelloServer
                     var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
                     j.AddLast(new LengthFieldPrepender(4, true));
                     j.AddLast(new TLengthFieldBasedFrameDecoder(ByteOrder.BigEndian, packetMaxSize, 0, 4, -4, 4, true));
-                    j.AddLast(new TarsDecoder(), new TarsEncoder());
+                    j.AddLast(new TarsDecoder(null), new TarsEncoder(null));
                     //j.AddLast(new LoggingHandler(i.GetRequiredService<ILogger<LoggingHandler>>()));
                     j.AddLast(new TestHandler());
                 })

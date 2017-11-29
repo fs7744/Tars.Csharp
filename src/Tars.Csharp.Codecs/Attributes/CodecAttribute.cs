@@ -1,16 +1,19 @@
 ﻿using DotNetty.Buffers;
 using System;
+using Tars.Csharp.Codecs.Tup;
 
-namespace Tars.Csharp.Attributes
+namespace Tars.Csharp.Codecs.Attributes
 {
     public abstract class CodecAttribute : Attribute
     {
-        public abstract object DecodeRequest(IByteBuffer input);
+        public abstract string Key { get; }
 
-        public abstract object DecodeResponse(IByteBuffer input);
+        public abstract RequestPacket DecodeRequest(IByteBuffer input);
 
-        public abstract IByteBuffer EncodeRequest(object request);
+        public abstract RequestPacket DecodeResponse(IByteBuffer input);
 
-        public abstract IByteBuffer EncodeResponse(object response);
+        public abstract IByteBuffer EncodeRequest(RequestPacket request);
+
+        public abstract IByteBuffer EncodeResponse(RequestPacket response);
     }
 }

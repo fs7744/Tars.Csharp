@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Tars.Csharp.Attributes;
+using Tars.Csharp.Codecs.Attributes;
 
 namespace Tars.Csharp.Codecs
 {

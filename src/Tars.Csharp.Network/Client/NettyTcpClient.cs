@@ -34,9 +34,9 @@ namespace Tars.Csharp.Network.Client
                 .Handler(new ActionChannelInitializer<IChannel>(channel =>
                 {
                     IChannelPipeline pipeline = channel.Pipeline;
-                    pipeline.AddLast(new ReConnectHandler(this));
-                    pipeline.AddLast(new LengthFieldPrepender(4, true));
-                    pipeline.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, ushort.MaxValue, 0, 4, -4, 4, true));
+                    //pipeline.AddLast(new ReConnectHandler(this));
+                    //pipeline.AddLast(new LengthFieldPrepender(4, true));
+                    //pipeline.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, ushort.MaxValue, 0, 4, -4, 4, true));
                 }));
 
             return this;
@@ -95,7 +95,7 @@ namespace Tars.Csharp.Network.Client
 
         public object SendAsync(EndPoint endPoint, IByteBuffer request, int timeout)
         {
-            ConnectAsync
+            throw new NotImplementedException();
         }
     }
 }
