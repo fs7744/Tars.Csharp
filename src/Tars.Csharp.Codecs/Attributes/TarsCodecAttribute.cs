@@ -22,6 +22,16 @@ namespace Tars.Csharp.Codecs.Attributes
             throw new NotImplementedException();
         }
 
+        public override object[] DecodeMethodParameters(byte[] input, RpcMethodMetadata metdata)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object DecodeReturnValue(byte[] input, RpcMethodMetadata metdata)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IByteBuffer EncodeRequest(RequestPacket request)
         {
             throw new NotImplementedException();
@@ -33,6 +43,16 @@ namespace Tars.Csharp.Codecs.Attributes
             var outputStream = new TarsOutputStream(buf);
             response.WriteTo(outputStream);
             return buf.Slice();
+        }
+
+        public override byte[] EncodeMethodParameters(object[] parameters, RpcMethodMetadata metdata)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] EncodeReturnValue(object returnValue, RpcMethodMetadata metdata)
+        {
+            throw new NotImplementedException();
         }
     }
 }
