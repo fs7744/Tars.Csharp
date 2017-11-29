@@ -8,4 +8,8 @@
     <PackageReference Include="DotNetty.Codecs" Version="0.4.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Abstraction\" />
+  </ItemGroup>
+
 </Project>

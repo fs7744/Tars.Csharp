@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Tars.Csharp.Codecs.Attributes;
 using Tars.Csharp.Rpc;
 using Tars.Csharp.Rpc.Attributes;
 using Tars.Csharp.Rpc.Clients;
@@ -35,7 +36,8 @@ namespace HelloClient
         }
     }
 
-    [Rpc(Codec = Codec.Tars)]
+    [Rpc]
+    [TarsCodec]
     public interface IHelloRpc
     {
         Task<string> Hello(int no, string name);
