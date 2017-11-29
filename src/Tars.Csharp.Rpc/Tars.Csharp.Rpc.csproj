@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Tars.Csharp.Network\Tars.Csharp.Network.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+  </ItemGroup>
+
 </Project>

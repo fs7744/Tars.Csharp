@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using Tars.Csharp.Codecs.Attributes;
+using Tars.Csharp.Attributes;
 using Tars.Csharp.Rpc;
 using Tars.Csharp.Rpc.Attributes;
 using Tars.Csharp.Rpc.Clients;
@@ -18,7 +18,7 @@ namespace HelloClient
         private static async Task Run()
         {
             var service = new ServiceCollection()
-                .AddRpcProxy(typeof(Program).Assembly)
+                .AddRpcMetadatas(typeof(Program).Assembly)
                 .UseSimpleRpcClient()
                 .BuildServiceProvider();
 

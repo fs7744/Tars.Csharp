@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspectCore.Extensions.Reflection" Version="0.2.4" />
     <PackageReference Include="DotNetty.Codecs" Version="0.4.7" />
   </ItemGroup>
 

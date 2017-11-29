@@ -1,7 +1,7 @@
 ﻿using DotNetty.Buffers;
 using System;
 
-namespace Tars.Csharp.Codecs.Attributes
+namespace Tars.Csharp.Attributes
 {
     public abstract class CodecAttribute : Attribute
     {

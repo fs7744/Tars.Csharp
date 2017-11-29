@@ -2,7 +2,7 @@
 using System;
 using Tars.Csharp.Codecs.Tup;
 
-namespace Tars.Csharp.Codecs.Attributes
+namespace Tars.Csharp.Attributes
 {
     public class TarsCodecAttribute : CodecAttribute
     {

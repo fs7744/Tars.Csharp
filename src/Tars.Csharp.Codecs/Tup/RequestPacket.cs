@@ -28,6 +28,10 @@ namespace Tars.Csharp.Codecs.Tup
 
         public string ResultDesc { get; set; }
 
+        public object[] FuncParameters { get; set; }
+
+        public RpcMethodMetadata FuncMetadata { get; set; }
+
         public override void ReadFrom(TarsInputStream inputStream)
         {
             Version = inputStream.Read(Version, 1, true);
