@@ -14,10 +14,10 @@ namespace Tars.Csharp.Rpc
 
         protected override void ChannelRead0(IChannelHandlerContext ctx, RequestPacket msg)
         {
-            if (!metadatas.TryGetValue(msg.ServantName, out RpcMetadata metadata) ||
-                !metadata.Methods.TryGetValue(msg.FuncName, out RpcMethodMetadata methodMetadata))
+            if (metadatas.TryGetValue(msg.ServantName, out RpcMetadata metadata) &&
+                metadata.Methods.TryGetValue(msg.FuncName, out RpcMethodMetadata methodMetadata))
             {
-
+                
             }
             else
             {
