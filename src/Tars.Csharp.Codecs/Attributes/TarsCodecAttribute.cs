@@ -1,5 +1,4 @@
 ﻿using DotNetty.Buffers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tars.Csharp.Codecs.Tup;
@@ -228,11 +227,17 @@ namespace Tars.Csharp.Codecs.Attributes
             var outputStream = new TarsOutputStream(buf);
             outputStream.Write(request.Version, 1);
             outputStream.Write(request.PacketType, 2);
+            //outputStream.Write(request.RequestId, 3);
+            //outputStream.Write(request.MessageType, 4);
+            //outputStream.Write(request.Ret, 5);
+            //outputStream.Write(request.Buffer, 6);
+            //outputStream.Write(request.Status, 7);
+            //outputStream.Write(request.ResultDesc == null ? "" : request.ResultDesc, 8);
             outputStream.Write(request.MessageType, 3);
             outputStream.Write(request.RequestId, 4);
-            outputStream.Write(request.ServantName,5);
-            outputStream.Write(request.FuncName,6);
-            outputStream.Write(request.Buffer,7);
+            outputStream.Write(request.ServantName, 5);
+            outputStream.Write(request.FuncName, 6);
+            outputStream.Write(request.Buffer, 7);
             outputStream.Write(request.Timeout, 8);
             outputStream.Write(request.Context, 9);
             outputStream.Write(request.Status, 10);
@@ -337,7 +342,7 @@ namespace Tars.Csharp.Codecs.Attributes
         {
             var buf = Unpooled.Buffer(128);
             var output = new TarsOutputStream(buf);
-            output.Write(returnValue, 0);
+            output.Write(returnValue, metdata.ReturnInfo.Position);
             return output.ToByteArray();
             //if (TarsHelper.isPing(request.getFunctionName()))
             //{
