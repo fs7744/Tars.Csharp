@@ -1,5 +1,4 @@
 ﻿using AspectCore.Extensions.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +10,11 @@ namespace Tars.Csharp.Rpc
 {
     public static class RpcMetadataExtensions
     {
-        public static IServiceCollection AddRpcMetadatas(this IServiceCollection service, Assembly assembly)
+        public static IDictionary<Type, RpcMetadata> ScanRpcMetadatas(this Assembly[] assembly, bool isGenerateReflector, Func<Type, bool> predicate)
         {
             var metadatas = new Dictionary<Type, RpcMetadata>();
-            foreach (var item in assembly.GetExportedTypes()
-                .Where(i => i.IsInterface && !i.IsGenericType && i.GetReflector().IsDefined<RpcAttribute>()))
+            
+            foreach (var item in assembly.SelectMany(i => i.GetExportedTypes().Where(predicate)).Distinct())
             {
                 var reflector = item.GetReflector();
                 if (!reflector.IsDefined<CodecAttribute>())
@@ -29,14 +28,14 @@ namespace Tars.Csharp.Rpc
                     Codec = reflector.GetCustomAttribute<CodecAttribute>(),
                     Methods = new Dictionary<string, RpcMethodMetadata>(StringComparer.OrdinalIgnoreCase)
                 };
-                SetMethodMetaDatas(metadata);
+                SetMethodMetaDatas(metadata, isGenerateReflector);
                 metadatas.Add(item, metadata);
             }
 
-            return service.AddSingleton<IDictionary<Type, RpcMetadata>>(metadatas);
+            return metadatas;
         }
 
-        private static void SetMethodMetaDatas(RpcMetadata metadata)
+        private static void SetMethodMetaDatas(RpcMetadata metadata, bool isGenerateReflector)
         {
             foreach (var method in metadata.InterfaceType.GetMethods(BindingFlags.Public))
             {
@@ -44,7 +43,9 @@ namespace Tars.Csharp.Rpc
                 {
                     Name = method.Name,
                     ReturnInfo = method.ReturnParameter,
-                    Parameters = method.GetParameters()
+                    Parameters = method.GetParameters(),
+                    MethodInfo = method,
+                    Reflector = isGenerateReflector ? method.GetReflector() : null
                 };
                 metadata.Methods.Add(m.Name, m);
             }

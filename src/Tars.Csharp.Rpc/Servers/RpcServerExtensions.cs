@@ -12,12 +12,13 @@ namespace Tars.Csharp.Rpc
 {
     public static class RpcServerExtensions
     {
-        public static ServerHostBuilder UseRpc(this ServerHostBuilder builder, Assembly assembly, RpcMode mode = RpcMode.Tcp, bool isLibuv = true)
+        public static ServerHostBuilder UseRpc(this ServerHostBuilder builder, RpcMode mode = RpcMode.Tcp, bool isLibuv = true, params Assembly[] assemblies)
         {
             UseTarsCodec(builder);
             builder.ConfigureServices(i => i.AddSingleton<TarsDecoder, TarsDecoder>()
                                            .AddSingleton<TarsEncoder, TarsEncoder>()
-                                           .AddSingleton<ServerHandler, ServerHandler>());
+                                           .AddSingleton<ServerHandler, ServerHandler>()
+                                           .AddSingleton(new ServerRpcMetadata(assemblies)));
             ConfigHost(builder, mode, isLibuv);
             return builder;
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tars.Csharp.Codecs.Attributes
+namespace Tars.Csharp.Rpc
 {
     public class RpcAttribute : Attribute
     {

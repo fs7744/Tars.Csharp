@@ -9,10 +9,10 @@ namespace Tars.Csharp.Rpc.Clients
 {
     public class RpcClient<T> : IRpcClient where T : IClient
     {
-        protected IDictionary<Type, RpcMetadata> metadatas;
+        protected RpcClientMetadata metadatas;
         protected T client;
 
-        public RpcClient(IDictionary<Type, RpcMetadata> metadatas, T client)
+        public RpcClient(RpcClientMetadata metadatas, T client)
         {
             this.metadatas = metadatas;
             this.client = client;

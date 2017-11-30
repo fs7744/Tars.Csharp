@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Tars.Csharp.Codecs.Attributes;
+using AspectCore.Extensions.Reflection;
 
 namespace Tars.Csharp.Codecs
 {
@@ -19,5 +20,7 @@ namespace Tars.Csharp.Codecs
         public string Name { get; set; }
         public ParameterInfo ReturnInfo { get; set; }
         public ParameterInfo[] Parameters { get; set; }
+        public MethodInfo MethodInfo { get; set; }
+        public MethodReflector Reflector { get; set; }
     }
 }
