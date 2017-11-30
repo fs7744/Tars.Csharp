@@ -17,7 +17,7 @@ namespace Tars.Csharp.Codecs
 
         protected override void Encode(IChannelHandlerContext context, RequestPacket message, List<object> output)
         {
-            if (message.PacketType == Const.OneWay) return;
+            if (message == null || message.PacketType == Const.OneWay) return;
             var res = tars.EncodeResponse(message);
             if (res != null) output.Add(res);
         }

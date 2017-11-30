@@ -1,14 +1,12 @@
-﻿using DotNetty.Transport.Bootstrapping;
+﻿using DotNetty.Buffers;
+using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
+using DotNetty.Transport.Channels.Sockets;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using DotNetty.Buffers;
-using DotNetty.Transport.Channels.Sockets;
 
 namespace Tars.Csharp.Network.Client
 {
@@ -16,28 +14,23 @@ namespace Tars.Csharp.Network.Client
     {
         private ILogger<NettyTcpClient> logger;
 
-        public NettyTcpClient(ILogger<NettyTcpClient> logger)
+        public NettyTcpClient(ILogger<NettyTcpClient> logger, NetworkClientInitializer initializer)
         {
             this.logger = logger;
+            Build(initializer);
         }
 
         private MultithreadEventLoopGroup group = new MultithreadEventLoopGroup();
         private Bootstrap bootstrap = new Bootstrap();
         private ConcurrentDictionary<EndPoint, IChannel> channels = new ConcurrentDictionary<EndPoint, IChannel>();
 
-        public NettyTcpClient Build()
+        public NettyTcpClient Build(NetworkClientInitializer initializer)
         {
             bootstrap
                 .Group(group)
                 .Channel<TcpSocketChannel>()
                 .Option(ChannelOption.TcpNodelay, true)
-                .Handler(new ActionChannelInitializer<IChannel>(channel =>
-                {
-                    IChannelPipeline pipeline = channel.Pipeline;
-                    //pipeline.AddLast(new ReConnectHandler(this));
-                    //pipeline.AddLast(new LengthFieldPrepender(4, true));
-                    //pipeline.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian, ushort.MaxValue, 0, 4, -4, 4, true));
-                }));
+                .Handler(new ActionChannelInitializer<IChannel>(channel => initializer.Init(channel)));
 
             return this;
         }
@@ -83,19 +76,15 @@ namespace Tars.Csharp.Network.Client
             return channels.TryRemove(point, out IChannel channel);
         }
 
-        public Task ShutdownGracefullyAsync(TimeSpan quietPeriod, TimeSpan timeout)
-        {
-            return group.ShutdownGracefullyAsync(quietPeriod, timeout);
-        }
-
         public Task ShutdownGracefullyAsync()
         {
-            throw new NotImplementedException();
+            return group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1));
         }
 
-        public object SendAsync(EndPoint endPoint, IByteBuffer request, int timeout)
+        public async Task SendAsync(EndPoint endPoint, IByteBuffer request, int timeout)
         {
-            throw new NotImplementedException();
+            var channel = await ConnectAsync(endPoint);
+            await channel.WriteAndFlushAsync(request);
         }
     }
 }

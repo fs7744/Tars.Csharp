@@ -10,8 +10,9 @@ namespace Tars.Csharp.Rpc.Clients
             return service
                 .AddSingleton<ITcpClient, NettyTcpClient>()
                 .AddSingleton<IUdpClient, UdpClient>()
-                .AddSingleton<TcpRpcClient, TcpRpcClient>()
-                .AddSingleton<UdpRpcClient, UdpRpcClient>()
+                .AddSingleton<RpcClient<ITcpClient>, RpcClient<ITcpClient>>()
+                .AddSingleton<RpcClient<IUdpClient>, RpcClient<IUdpClient>>()
+                .AddTransient<NetworkClientInitializer, RpcClientInitializer>()
                 .AddSingleton<IRpcClientFactory, SimpleRpcClientFactory>();
         }
     }

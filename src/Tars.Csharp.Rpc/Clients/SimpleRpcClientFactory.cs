@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Tars.Csharp.Network.Client;
 using Tars.Csharp.Rpc.DynamicProxy;
 
 namespace Tars.Csharp.Rpc.Clients
@@ -21,8 +22,8 @@ namespace Tars.Csharp.Rpc.Clients
         private IRpcClient GetClient(RpcMode mode)
         {
             return clients.GetOrAdd(mode, m => m == RpcMode.Tcp
-            ? (IRpcClient)provider.GetRequiredService<TcpRpcClient>()
-            : provider.GetRequiredService<UdpRpcClient>());
+            ? (IRpcClient)provider.GetRequiredService<RpcClient<ITcpClient>>()
+            : provider.GetRequiredService<RpcClient<IUdpClient>>());
         }
 
         public T CreateProxy<T>(RpcContext context)

@@ -3,16 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
+using Tars.Csharp.Network.Client;
 
 namespace Tars.Csharp.Rpc.Clients
 {
-    public abstract class RpcClient : IRpcClient
+    public class RpcClient<T> : IRpcClient where T : IClient
     {
         protected IDictionary<Type, RpcMetadata> metadatas;
+        protected T client;
 
-        public RpcClient(IDictionary<Type, RpcMetadata> metadatas)
+        public RpcClient(IDictionary<Type, RpcMetadata> metadatas, T client)
         {
             this.metadatas = metadatas;
+            this.client = client;
         }
 
         public object Inovke(RpcContext context, string methodName, object[] parameters)
@@ -22,14 +25,19 @@ namespace Tars.Csharp.Rpc.Clients
 
             var packet = context.CreatePacket();
             packet.FuncName = methodName;
-            packet.FuncMetadata = methodMetadata;
-            packet.FuncParameters = parameters;
+            packet.Buffer = metadata.Codec.EncodeMethodParameters(parameters, methodMetadata);
             var request = metadata.Codec.EncodeRequest(packet);
             return SendAsync(context, request);
         }
 
-        public abstract Task ShutdownAsync();
+        public Task ShutdownAsync()
+        {
+            return client.ShutdownGracefullyAsync();
+        }
 
-        public abstract object SendAsync(RpcContext context, IByteBuffer request);
+        public object SendAsync(RpcContext context, IByteBuffer request)
+        {
+            return client.SendAsync(context.EndPoint, request, context.Timeout);
+        }
     }
 }

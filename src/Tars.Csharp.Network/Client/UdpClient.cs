@@ -7,12 +7,12 @@ namespace Tars.Csharp.Network.Client
 {
     public class UdpClient : IUdpClient
     {
-        public object SendAsync(EndPoint endPoint, IByteBuffer request, int timeout)
+        public Task ShutdownGracefullyAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task ShutdownGracefullyAsync()
+        public Task SendAsync(EndPoint endPoint, IByteBuffer request, int timeout)
         {
             throw new NotImplementedException();
         }

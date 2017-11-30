@@ -7,6 +7,6 @@ namespace Tars.Csharp.Network.Client
     public interface IClient
     {
         Task ShutdownGracefullyAsync();
-        object SendAsync(EndPoint endPoint, IByteBuffer request, int timeout);
+        Task SendAsync(EndPoint endPoint, IByteBuffer request, int timeout);
     }
 }
