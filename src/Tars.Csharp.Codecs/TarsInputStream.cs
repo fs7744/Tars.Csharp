@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Codecs.Util;
 
 namespace Tars.Csharp.Codecs
@@ -553,7 +554,7 @@ namespace Tars.Csharp.Codecs
                                 int len = 0;
                                 len = buffer.ReadInt();
 
-                                if (len > TarsStruct.TarsMaxStringLength || len < 0)
+                                if (len > Const.TarsMaxStringLength || len < 0)
                                 {
                                     throw new TarsDecodeException("string too long: " + len);
                                 }
@@ -611,7 +612,7 @@ namespace Tars.Csharp.Codecs
                         {
                             int len = 0;
                             len = buffer.ReadInt();
-                            if (len > TarsStruct.TarsMaxStringLength || len < 0)
+                            if (len > Const.TarsMaxStringLength || len < 0)
                             {
                                 throw new TarsDecodeException("string too long: " + len);
                             }

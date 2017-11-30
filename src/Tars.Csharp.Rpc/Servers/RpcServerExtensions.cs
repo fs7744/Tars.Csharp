@@ -14,11 +14,25 @@ namespace Tars.Csharp.Rpc
     {
         public static ServerHostBuilder UseRpc(this ServerHostBuilder builder, RpcMode mode = RpcMode.Tcp, bool isLibuv = true, params Assembly[] assemblies)
         {
+            var ms = new ServerRpcMetadata(assemblies);
             UseTarsCodec(builder);
-            builder.ConfigureServices(i => i.AddSingleton<TarsDecoder, TarsDecoder>()
-                                           .AddSingleton<TarsEncoder, TarsEncoder>()
-                                           .AddSingleton<ServerHandler, ServerHandler>()
-                                           .AddSingleton(new ServerRpcMetadata(assemblies)));
+            builder.ConfigureServices(i =>
+            {
+                var services = i.AddSingleton<ServerHandler, ServerHandler>()
+                                .AddSingleton<TarsCodecAttribute, TarsCodecAttribute>();
+                foreach (var item in ms.metadatas)
+                {
+                    services.AddSingleton(item.Value.InterfaceType, item.Value.ServantType);
+                }
+                services.AddSingleton(j =>
+                {
+                    foreach (var item in ms.metadatas)
+                    {
+                        item.Value.ServantInstance = j.GetRequiredService(item.Value.InterfaceType);
+                    }
+                    return ms;
+                });
+            });
             ConfigHost(builder, mode, isLibuv);
             return builder;
         }
@@ -28,13 +42,12 @@ namespace Tars.Csharp.Rpc
             Action<IServiceProvider, IChannelPipeline> action = (i, j) =>
             {
                 var config = i.GetRequiredService<IConfigurationRoot>();
-                var decoder = i.GetRequiredService<TarsDecoder>();
-                var encoder = i.GetRequiredService<TarsEncoder>();
+                var codec = i.GetRequiredService<TarsCodecAttribute>();
                 var handler = i.GetRequiredService<ServerHandler>();
                 var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
                 var lengthFieldLength = config.GetValue(ServerHostOptions.LengthFieldLength, 4);
                 j.AddLengthFieldHanlder(packetMaxSize, lengthFieldLength);
-                j.AddLast(decoder, encoder, handler);
+                j.AddLast(new TarsDecoder(codec), new TarsEncoder(codec), handler);
             };
 
             switch (mode)

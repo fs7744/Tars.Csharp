@@ -9,9 +9,9 @@ namespace Tars.Csharp.Rpc.Clients
     {
         internal IDictionary<string, RpcMetadata> metadatas;
 
-        public RpcClientMetadata(Assembly[] assemblies)
+        public RpcClientMetadata(Assembly[] assemblies, bool isGenerateReflector = false)
         {
-            metadatas = assemblies.ScanRpcMetadatas(false, i =>
+            metadatas = assemblies.ScanRpcMetadatas(isGenerateReflector, i =>
             {
                 var name = i.GetReflector().GetCustomAttribute<RpcAttribute>().Servant;
                 return string.IsNullOrWhiteSpace(name) ? i.FullName : name;

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -17,7 +19,10 @@ namespace HelloClient
 
         private static async Task Run()
         {
+            var builder = new ConfigurationBuilder();
             var service = new ServiceCollection()
+                .AddSingleton(i => builder.Build())
+                .AddLogging(j => j.AddConsole().SetMinimumLevel(LogLevel.Trace))
                 .UseSimpleRpcClient(typeof(Program).Assembly)
                 .BuildServiceProvider();
 
@@ -25,19 +30,20 @@ namespace HelloClient
             var context = new RpcContext()
             {
                 Servant = "TestApp.HelloServer.HelloObj",
-                EndPoint = new DnsEndPoint("127.0.0.1", 8989),
+                EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8989),
                 Mode = RpcMode.Tcp
             };
             var proxy = factory.CreateProxy<IHelloRpc>(context);
-            Console.WriteLine(await proxy.Hello(1, "Victor"));
+            Console.WriteLine(proxy.Hello(1, "Victor"));
+            Console.ReadKey();
             await factory.ShutdownAsync();
         }
     }
 
-    [Rpc]
+    [Rpc(Servant = "TestApp.HelloServer.HelloObj")]
     [TarsCodec]
     public interface IHelloRpc
     {
-        Task<string> Hello(int no, string name);
+        string Hello(int no, string name);
     }
 }

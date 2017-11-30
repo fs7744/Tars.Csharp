@@ -38,7 +38,7 @@ namespace Tars.Csharp.Rpc
 
         private static void SetMethodMetaDatas(RpcMetadata metadata, bool isGenerateReflector)
         {
-            foreach (var method in metadata.InterfaceType.GetMethods(BindingFlags.Public))
+            foreach (var method in metadata.InterfaceType.GetMethods())
             {
                 var m = new RpcMethodMetadata()
                 {

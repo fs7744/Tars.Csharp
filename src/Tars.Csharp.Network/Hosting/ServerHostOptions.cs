@@ -7,6 +7,6 @@
         public const string ShutdownQuietPeriod = "ShutdownQuietPeriod";
         public const string ShutdownTimeout = "ShutdownTimeout";
         public const string Port = "Port";
-        public static readonly string LengthFieldLength;
+        public const string LengthFieldLength = "LengthFieldLength";
     }
 }

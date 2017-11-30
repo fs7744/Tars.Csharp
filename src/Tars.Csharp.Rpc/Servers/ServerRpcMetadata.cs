@@ -1,30 +1,32 @@
-﻿using AspectCore.Extensions.Reflection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Rpc.Clients;
-using System.Linq;
 
 namespace Tars.Csharp.Rpc
 {
     public class ServerRpcMetadata
     {
-        private IDictionary<string, RpcMetadata> metadatas;
+        internal IDictionary<string, RpcMetadata> metadatas;
 
         public ServerRpcMetadata(Assembly[] assemblies)
         {
-            this.metadatas = new RpcClientMetadata(assemblies).metadatas;
-            foreach (var item in metadatas)
+            metadatas = new RpcClientMetadata(assemblies, true).metadatas;
+            var ms = metadatas.Values.ToList();
+            foreach (var item in assemblies
+                .SelectMany(i => i.GetExportedTypes()
+                    .Where(j => j.IsClass && !j.IsGenericType && !j.IsAbstract)).Distinct())
             {
-               
+                var interfaceMetadata = ms.FirstOrDefault(x => x.InterfaceType.IsAssignableFrom(item));
+                if (interfaceMetadata == null) continue;
+                ms.Remove(interfaceMetadata);
+                interfaceMetadata.ServantType = item;
             }
-            metadatas = assemblies.ScanRpcMetadatas(true, i =>
+            foreach (var item in metadatas.Values.Where(i => i.ServantType == null).ToArray())
             {
-                var name = i.GetReflector().GetCustomAttribute<RpcAttribute>().Servant;
-                return string.IsNullOrWhiteSpace(name) ? i.FullName : name;
-            }, i => i.IsClass && !i.IsGenericType && !i.IsAbstract 
-                && i.GetReflector().IsDefined<RpcAttribute>() 
-                && interfaces.Any(j => i.IsAssignableFrom(j.InterfaceType)));
+                metadatas.Remove(item.Servant);
+            }
         }
 
         public bool TryGetValue(string servantName, out RpcMetadata metadata)

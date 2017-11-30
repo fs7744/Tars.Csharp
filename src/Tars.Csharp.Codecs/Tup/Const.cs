@@ -45,5 +45,6 @@
         public const byte OneWay = 0x01;
 
         public const string TarsCodec = "Tars";
+        public const int TarsMaxStringLength = 100 * 1024 * 1024;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Tars.Csharp.Codecs.Tup
 {
-    public class RequestPacket : TarsStruct
+    public class RequestPacket
     {
         public short Version { get; set; }
 
@@ -28,19 +28,17 @@ namespace Tars.Csharp.Codecs.Tup
 
         public string ResultDesc { get; set; }
 
-        //public object[] FuncParameters { get; set; }
-
-        //public RpcMethodMetadata FuncMetadata { get; set; }
-
-        public override void ReadFrom(TarsInputStream inputStream)
+        public RequestPacket CreateResponse()
         {
-        }
-
-        public override void WriteTo(TarsOutputStream outputStream)
-        {
-            //outputStream.PutZero();
-            
-            //outputStream.PutDataLength();
+            return new RequestPacket()
+            {
+                Version = Version,
+                MessageType = MessageType,
+                RequestId = RequestId,
+                ServantName = ServantName,
+                FuncName = FuncName,
+                Timeout = Timeout,
+            };
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Tars.Csharp.Rpc.Clients
         public int Timeout { get; set; }
         public IDictionary<string, string> Context { get; set; }
         public IDictionary<string, string> Status { get; set; }
-        public short Version { get; set; }
+        public short Version { get; set; } = Const.Version;
         public int RequestId { get; set; }
         public int MessageType { get; set; }
         public byte PacketType { get; set; }

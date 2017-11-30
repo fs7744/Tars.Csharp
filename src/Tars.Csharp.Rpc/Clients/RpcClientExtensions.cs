@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Tars.Csharp.Network.Client;
+using Tars.Csharp.Rpc.DynamicProxy;
 
 namespace Tars.Csharp.Rpc.Clients
 {
@@ -14,7 +15,10 @@ namespace Tars.Csharp.Rpc.Clients
                 .AddSingleton<RpcClient<ITcpClient>, RpcClient<ITcpClient>>()
                 .AddSingleton<RpcClient<IUdpClient>, RpcClient<IUdpClient>>()
                 .AddTransient<NetworkClientInitializer, RpcClientInitializer>()
-                .AddSingleton<IRpcClientFactory, SimpleRpcClientFactory>();
+                .AddSingleton<IRpcClientFactory, SimpleRpcClientFactory>()
+                .AddSingleton<IDynamicProxyGenerator, DynamicProxyGenerator>()
+                .AddTransient<NetworkClientInitializer, RpcClientInitializer>()
+                .AddSingleton<ClientHandler, ClientHandler>();
         }
     }
 }
