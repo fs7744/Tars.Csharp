@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Rpc.DynamicProxy;
@@ -8,11 +7,10 @@ namespace Tars.Csharp.Rpc.Clients
 {
     public class RpcContext : DynamicProxyContext
     {
-        public string Name { get; set; }
         public EndPoint EndPoint { get; set; }
         public IRpcClient Client { get; set; }
         public RpcMode Mode { get; set; }
-        public Type InterfaceType { get; set; }
+        public string Servant { get; set; }
         public int Timeout { get; set; }
         public IDictionary<string, string> Context { get; set; }
         public IDictionary<string, string> Status { get; set; }
@@ -25,7 +23,7 @@ namespace Tars.Csharp.Rpc.Clients
         {
             return new RequestPacket()
             {
-                ServantName = Name,
+                ServantName = Servant,
                 Version = Version,
                 RequestId = RequestId,
                 MessageType = MessageType,

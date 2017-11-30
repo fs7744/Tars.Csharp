@@ -20,7 +20,7 @@ namespace Tars.Csharp.Rpc.Clients
 
         public object Inovke(RpcContext context, string methodName, object[] parameters)
         {
-            if (!metadatas.TryGetValue(context.InterfaceType, out RpcMetadata metadata)
+            if (!metadatas.TryGetValue(context.Servant, out RpcMetadata metadata)
                 || !metadata.Methods.TryGetValue(methodName, out RpcMethodMetadata methodMetadata)) return null;
 
             var packet = context.CreatePacket();

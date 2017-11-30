@@ -24,7 +24,7 @@ namespace HelloClient
             var factory = service.GetRequiredService<IRpcClientFactory>();
             var context = new RpcContext()
             {
-                Name = "TestApp.HelloServer.HelloObj",
+                Servant = "TestApp.HelloServer.HelloObj",
                 EndPoint = new DnsEndPoint("127.0.0.1", 8989),
                 Mode = RpcMode.Tcp
             };

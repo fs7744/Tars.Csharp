@@ -11,8 +11,11 @@ namespace Tars.Csharp.Rpc
 
         public ServerRpcMetadata(Assembly[] assemblies)
         {
-            metadatas = assemblies.ScanRpcMetadatas(true, i => i.GetReflector().GetCustomAttribute<RpcAttribute>().Servant,
-                i => i.IsClass && !i.IsGenericType && i.GetReflector().IsDefined<RpcAttribute>());
+            metadatas = assemblies.ScanRpcMetadatas(true, i =>
+            {
+                var name = i.GetReflector().GetCustomAttribute<RpcAttribute>().Servant;
+                return string.IsNullOrWhiteSpace(name) ? i.FullName : name;
+            }, i => i.IsClass && !i.IsGenericType && i.GetReflector().IsDefined<RpcAttribute>());
         }
 
         public bool TryGetValue(string servantName, out RpcMetadata metadata)
