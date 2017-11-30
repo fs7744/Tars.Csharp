@@ -10,10 +10,10 @@ namespace Tars.Csharp.Rpc
 {
     public static class RpcMetadataExtensions
     {
-        public static IDictionary<Type, RpcMetadata> ScanRpcMetadatas(this Assembly[] assembly, bool isGenerateReflector, Func<Type, bool> predicate)
+        public static IDictionary<T, RpcMetadata> ScanRpcMetadatas<T>(this Assembly[] assembly, bool isGenerateReflector, Func<Type, T> getKey, Func<Type, bool> predicate)
         {
-            var metadatas = new Dictionary<Type, RpcMetadata>();
-            
+            var metadatas = new Dictionary<T, RpcMetadata>();
+
             foreach (var item in assembly.SelectMany(i => i.GetExportedTypes().Where(predicate)).Distinct())
             {
                 var reflector = item.GetReflector();
@@ -29,7 +29,7 @@ namespace Tars.Csharp.Rpc
                     Methods = new Dictionary<string, RpcMethodMetadata>(StringComparer.OrdinalIgnoreCase)
                 };
                 SetMethodMetaDatas(metadata, isGenerateReflector);
-                metadatas.Add(item, metadata);
+                metadatas.Add(getKey(item), metadata);
             }
 
             return metadatas;

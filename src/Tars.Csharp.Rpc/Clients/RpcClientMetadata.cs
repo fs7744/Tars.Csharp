@@ -12,7 +12,7 @@ namespace Tars.Csharp.Rpc.Clients
 
         public RpcClientMetadata(Assembly[] assemblies)
         {
-            metadatas = assemblies.ScanRpcMetadatas(false,
+            metadatas = assemblies.ScanRpcMetadatas(false, i => i,
                 i => i.IsInterface && !i.IsGenericType && i.GetReflector().IsDefined<RpcAttribute>());
         }
 

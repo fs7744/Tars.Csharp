@@ -10,6 +10,8 @@ namespace Tars.Csharp.Codecs
     {
         public Type InterfaceType { get; set; }
 
+        public string Servant { get; set; }
+
         public CodecAttribute Codec { get; set; }
 
         public Dictionary<string, RpcMethodMetadata> Methods { get; set; }
