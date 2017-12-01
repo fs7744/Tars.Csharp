@@ -12,7 +12,7 @@ namespace Tars.Csharp.Network.Client
             throw new NotImplementedException();
         }
 
-        public Task SendAsync(EndPoint endPoint, IByteBuffer request, int timeout)
+        public Task SendAsync(EndPoint endPoint, IByteBuffer request)
         {
             throw new NotImplementedException();
         }

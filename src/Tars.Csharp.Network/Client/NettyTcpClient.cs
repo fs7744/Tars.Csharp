@@ -35,40 +35,18 @@ namespace Tars.Csharp.Network.Client
             return this;
         }
 
-        private async Task<IChannel> TryConnectAsync(EndPoint endPoint, int retryCount = -1, int millisecondsDelay = 1000)
+        private async Task<IChannel> TryConnectAsync(EndPoint endPoint)
         {
-            var count = retryCount + 1;
-            IChannel channel = null;
-            Exception e = null;
-            while (retryCount == -1 || count > 0)
-            {
-                count--;
-                try
-                {
-                    channel = await bootstrap.ConnectAsync(endPoint);
-                    e = null;
-                    channels.AddOrUpdate(endPoint, channel, (x, y) => channel);
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    e = ex;
-                    logger.LogError(ex.Message, ex);
-                    await Task.Delay(millisecondsDelay);
-                    continue;
-                }
-            }
-            if (e != null)
-            {
-                throw e;
-            }
+            var channel = await bootstrap.ConnectAsync(endPoint);
+            channels.AddOrUpdate(endPoint, channel, (x, y) => channel);
             return channel;
         }
 
-        public Task<IChannel> ConnectAsync(EndPoint endPoint, int retryCount = -1, int millisecondsDelay = 1000)
+        public Task<IChannel> ConnectAsync(EndPoint endPoint)
         {
-            if (channels.TryGetValue(endPoint, out IChannel channel)) return Task.FromResult(channel);
-            else return TryConnectAsync(endPoint, retryCount, millisecondsDelay);
+            if (channels.TryGetValue(endPoint, out IChannel channel)
+                && channel.Active) return Task.FromResult(channel);
+            else return TryConnectAsync(endPoint);
         }
 
         internal bool RemoveChannel(EndPoint point)
@@ -81,7 +59,7 @@ namespace Tars.Csharp.Network.Client
             return group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1));
         }
 
-        public async Task SendAsync(EndPoint endPoint, IByteBuffer request, int timeout)
+        public async Task SendAsync(EndPoint endPoint, IByteBuffer request)
         {
             var channel = await ConnectAsync(endPoint);
             await channel.WriteAndFlushAsync(request);

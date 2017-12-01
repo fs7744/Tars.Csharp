@@ -1,5 +1,4 @@
 ﻿using DotNetty.Transport.Channels;
-using System;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
 
@@ -10,9 +9,12 @@ namespace Tars.Csharp.Rpc.Clients
         public override bool IsSharable => true;
 
         private RpcClientMetadata metadatas;
-        public ClientHandler(RpcClientMetadata metadatas)
+        private ICallBackHandler<int> callBackHandler;
+
+        public ClientHandler(RpcClientMetadata metadatas, ICallBackHandler<int> callBackHandler)
         {
             this.metadatas = metadatas;
+            this.callBackHandler = callBackHandler;
         }
 
         public override void ChannelInactive(IChannelHandlerContext context)
@@ -28,8 +30,9 @@ namespace Tars.Csharp.Rpc.Clients
             if (metadatas.TryGetValue(msg.ServantName, out RpcMetadata metadata) &&
                 metadata.Methods.TryGetValue(msg.FuncName, out RpcMethodMetadata methodMetadata))
             {
-                var info = metadata.Codec.DecodeReturnValue(msg.Buffer, methodMetadata);
-                Console.WriteLine(info);
+                var info = "ss";
+                //var info = metadata.Codec.DecodeReturnValue(msg.Buffer, methodMetadata);
+                callBackHandler.SetResult(msg.RequestId, info);
             }
         }
     }

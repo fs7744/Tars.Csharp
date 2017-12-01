@@ -18,7 +18,8 @@ namespace Tars.Csharp.Rpc.Clients
                 .AddSingleton<IRpcClientFactory, SimpleRpcClientFactory>()
                 .AddSingleton<IDynamicProxyGenerator, DynamicProxyGenerator>()
                 .AddTransient<NetworkClientInitializer, RpcClientInitializer>()
-                .AddSingleton<ClientHandler, ClientHandler>();
+                .AddSingleton<ClientHandler, ClientHandler>()
+                .AddSingleton<ICallBackHandler<int>, CallBackHandler<int>>();
         }
     }
 }

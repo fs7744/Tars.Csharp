@@ -23,8 +23,8 @@ namespace Tars.Csharp.Codecs.Attributes
             result.FuncName = inputStream.ReadString(6, true);
             result.Buffer = inputStream.ReadBytes(7, true);
             result.Timeout = inputStream.Read(result.Timeout, 8, true);
-            result.Context = inputStream.ReadMap<string, string>(new Dictionary<string, string>(), 9, true);
-            result.Status = inputStream.ReadMap<string, string>(new Dictionary<string, string>(), 10, true);
+            result.Context = inputStream.ReadMap<string, string>(new Dictionary<string, string>(), 9, false);
+            result.Status = inputStream.ReadMap<string, string>(new Dictionary<string, string>(), 10, false);
             input.MarkReaderIndex();
 
             return result;
@@ -342,7 +342,7 @@ namespace Tars.Csharp.Codecs.Attributes
         {
             var buf = Unpooled.Buffer(128);
             var output = new TarsOutputStream(buf);
-            output.Write(returnValue, metdata.ReturnInfo.Position);
+            output.Write(returnValue, 0);
             return output.ToByteArray();
             //if (TarsHelper.isPing(request.getFunctionName()))
             //{

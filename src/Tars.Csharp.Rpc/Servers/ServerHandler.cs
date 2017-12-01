@@ -24,7 +24,7 @@ namespace Tars.Csharp.Rpc
                 var returnValue = methodMetadata.Reflector.Invoke(metadata.ServantInstance, parameters);
                 response.Buffer = metadata.Codec.EncodeReturnValue(returnValue, methodMetadata);
                 //response.Ret = ?
-                ctx.WriteAsync(msg);
+                ctx.WriteAsync(response);
             }
             else
             {

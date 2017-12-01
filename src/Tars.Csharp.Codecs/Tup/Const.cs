@@ -46,5 +46,6 @@
 
         public const string TarsCodec = "Tars";
         public const int TarsMaxStringLength = 100 * 1024 * 1024;
+        public const int DefaultTimeout = 60000;
     }
 }

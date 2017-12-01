@@ -1,5 +1,4 @@
-﻿using DotNetty.Buffers;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Network.Client;
 
@@ -9,11 +8,13 @@ namespace Tars.Csharp.Rpc.Clients
     {
         protected RpcClientMetadata metadatas;
         protected T client;
+        private ICallBackHandler<int> callBackHandler;
 
-        public RpcClient(RpcClientMetadata metadatas, T client)
+        public RpcClient(RpcClientMetadata metadatas, T client, ICallBackHandler<int> callBackHandler)
         {
             this.metadatas = metadatas;
             this.client = client;
+            this.callBackHandler = callBackHandler;
         }
 
         public object Inovke(RpcContext context, string methodName, object[] parameters)
@@ -25,17 +26,14 @@ namespace Tars.Csharp.Rpc.Clients
             packet.FuncName = methodName;
             packet.Buffer = metadata.Codec.EncodeMethodParameters(parameters, methodMetadata);
             var request = metadata.Codec.EncodeRequest(packet);
-            return SendAsync(context, request);
+            var task = client.SendAsync(context.EndPoint, request);
+            var r = callBackHandler.AddCallBack(context.RequestId, context.Timeout).Result;
+            return r;
         }
 
         public Task ShutdownAsync()
         {
             return client.ShutdownGracefullyAsync();
-        }
-
-        public object SendAsync(RpcContext context, IByteBuffer request)
-        {
-            return client.SendAsync(context.EndPoint, request, context.Timeout);
         }
     }
 }

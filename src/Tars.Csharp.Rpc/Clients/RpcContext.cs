@@ -11,7 +11,7 @@ namespace Tars.Csharp.Rpc.Clients
         public IRpcClient Client { get; set; }
         public RpcMode Mode { get; set; }
         public string Servant { get; set; }
-        public int Timeout { get; set; }
+        public int Timeout { get; set; } = Const.DefaultTimeout;
         public IDictionary<string, string> Context { get; set; }
         public IDictionary<string, string> Status { get; set; }
         public short Version { get; set; } = Const.Version;
