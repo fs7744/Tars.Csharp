@@ -6,11 +6,11 @@ using Tars.Csharp.Codecs.Tup;
 
 namespace Tars.Csharp.Codecs
 {
-    public class TarsEncoder : MessageToMessageEncoder<RequestPacket>
+    public class TarsResponseEncoder : MessageToMessageEncoder<RequestPacket>
     {
         private TarsCodecAttribute tars;
 
-        public TarsEncoder(TarsCodecAttribute tars)
+        public TarsResponseEncoder(TarsCodecAttribute tars)
         {
             this.tars = tars;
         }
@@ -18,8 +18,14 @@ namespace Tars.Csharp.Codecs
         protected override void Encode(IChannelHandlerContext context, RequestPacket message, List<object> output)
         {
             if (message == null || message.PacketType == Const.OneWay) return;
-            var res = tars.EncodeResponse(message);
-            if (res != null) output.Add(res);
+            var buf = context.Allocator.Buffer(128);
+            buf.WriteInt(0);
+            tars.EncodeResponse(buf, message);
+            var length = buf.WriterIndex;
+            buf.SetWriterIndex(0);
+            buf.WriteInt(length);
+            buf.SetWriterIndex(length);
+            output.Add(buf);
         }
     }
 }

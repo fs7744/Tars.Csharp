@@ -222,10 +222,9 @@ namespace Tars.Csharp.Codecs.Attributes
             //}
         }
 
-        public override IByteBuffer EncodeRequest(RequestPacket request)
+        public override void EncodeRequest(IByteBuffer output, RequestPacket request)
         {
-            var buf = Unpooled.Buffer(128);
-            var outputStream = new TarsOutputStream(buf);
+            var outputStream = new TarsOutputStream(output);
             outputStream.Write(request.Version, 1);
             outputStream.Write(request.PacketType, 2);
             outputStream.Write(request.MessageType, 3);
@@ -236,13 +235,11 @@ namespace Tars.Csharp.Codecs.Attributes
             outputStream.Write(request.Timeout, 8);
             outputStream.Write(request.Context, 9);
             outputStream.Write(request.Status, 10);
-            return buf.Slice();
         }
 
-        public override IByteBuffer EncodeResponse(RequestPacket response)
+        public override void EncodeResponse(IByteBuffer output, RequestPacket response)
         {
-            var buf = Unpooled.Buffer(128);
-            var outputStream = new TarsOutputStream(buf);
+            var outputStream = new TarsOutputStream(output);
             outputStream.Write(response.Version, 1);
             outputStream.Write(response.PacketType, 2);
             switch (response.Version)
@@ -252,7 +249,7 @@ namespace Tars.Csharp.Codecs.Attributes
                     outputStream.Write(response.MessageType, 4);
                     outputStream.Write(response.Ret, 5);
                     outputStream.Write(response.Buffer, 6);
-                    if (response.Status != null && response.Status.Count > 0)
+                    if (response.Status != null)
                     {
                         outputStream.Write(response.Status, 7);
                     }
@@ -260,7 +257,7 @@ namespace Tars.Csharp.Codecs.Attributes
                     {
                         outputStream.Write(response.ResultDesc ?? "", 8);
                     }
-                    if (response.Context != null && response.Context.Count > 0)
+                    if (response.Context != null)
                     {
                         outputStream.Write(response.Context, 9);
                     }
@@ -287,7 +284,6 @@ namespace Tars.Csharp.Codecs.Attributes
                 default:
                     break;
             }
-            return buf.Slice();
         }
 
         public override byte[] EncodeMethodParameters(object[] parameters, RpcMethodMetadata metdata)

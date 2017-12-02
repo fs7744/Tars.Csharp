@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Tars.Csharp.Codecs.Attributes;
 using Tars.Csharp.Network.Client;
 using Tars.Csharp.Rpc.DynamicProxy;
 
@@ -14,11 +15,12 @@ namespace Tars.Csharp.Rpc.Clients
                 .AddSingleton<IUdpClient, UdpClient>()
                 .AddSingleton<RpcClient<ITcpClient>, RpcClient<ITcpClient>>()
                 .AddSingleton<RpcClient<IUdpClient>, RpcClient<IUdpClient>>()
-                .AddTransient<NetworkClientInitializer, RpcClientInitializer>()
+                .AddTransient<NetworkClientInitializer<IUdpClient>, RpcUdpClientInitializer>()
                 .AddSingleton<IRpcClientFactory, SimpleRpcClientFactory>()
                 .AddSingleton<IDynamicProxyGenerator, DynamicProxyGenerator>()
-                .AddTransient<NetworkClientInitializer, RpcClientInitializer>()
+                .AddTransient<NetworkClientInitializer<ITcpClient>, RpcTcpClientInitializer>()
                 .AddSingleton<ClientHandler, ClientHandler>()
+                .AddSingleton<TarsCodecAttribute, TarsCodecAttribute>()
                 .AddSingleton<ICallBackHandler<int>, CallBackHandler<int>>();
         }
     }

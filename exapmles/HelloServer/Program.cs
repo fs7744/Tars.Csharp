@@ -48,7 +48,7 @@ namespace HelloServer
             new ServerHostBuilder()
                 .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
                 .ConfigureServices(i => i.AddLogging(j => j.AddConsole().SetMinimumLevel(LogLevel.Trace)))
-                .UseRpc(RpcMode.Tcp, true, typeof(Program).Assembly)
+                .UseRpc(RpcMode.Udp, true, typeof(Program).Assembly)
                 .Build()
                 .Run();
         }

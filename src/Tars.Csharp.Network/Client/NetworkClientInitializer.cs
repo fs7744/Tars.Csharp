@@ -2,7 +2,7 @@
 
 namespace Tars.Csharp.Network.Client
 {
-    public abstract class NetworkClientInitializer
+    public abstract class NetworkClientInitializer<T>
     {
         public abstract void Init(IChannel channel);
     }

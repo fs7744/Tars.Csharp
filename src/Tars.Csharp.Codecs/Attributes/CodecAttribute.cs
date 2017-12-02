@@ -16,9 +16,9 @@ namespace Tars.Csharp.Codecs.Attributes
 
         public abstract object DecodeReturnValue(byte[] input, RpcMethodMetadata metdata);
 
-        public abstract IByteBuffer EncodeRequest(RequestPacket request);
+        public abstract void EncodeRequest(IByteBuffer output, RequestPacket request);
 
-        public abstract IByteBuffer EncodeResponse(RequestPacket response);
+        public abstract void EncodeResponse(IByteBuffer output, RequestPacket response);
 
         public abstract byte[] EncodeMethodParameters(object[] parameters, RpcMethodMetadata metdata);
 

@@ -31,10 +31,11 @@ namespace HelloClient
             {
                 Servant = "TestApp.HelloServer.HelloObj",
                 EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8989),
-                Mode = RpcMode.Tcp
+                Mode = RpcMode.Udp
             };
             var proxy = factory.CreateProxy<IHelloRpc>(context);
-            Console.WriteLine(proxy.Hello(1, "Victor"));
+            var result = proxy.Hello(5, "Victor");
+            Console.WriteLine(result);
             Console.ReadKey();
             await factory.ShutdownAsync();
         }

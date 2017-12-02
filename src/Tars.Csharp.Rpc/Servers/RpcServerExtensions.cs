@@ -39,29 +39,32 @@ namespace Tars.Csharp.Rpc
 
         private static void ConfigHost(ServerHostBuilder builder, RpcMode mode, bool isLibuv)
         {
-            Action<IServiceProvider, IChannelPipeline> action = (i, j) =>
+            Action<IServiceProvider, IChannelPipeline, bool> action = (i, j, hasLengthField) =>
             {
                 var config = i.GetRequiredService<IConfigurationRoot>();
                 var codec = i.GetRequiredService<TarsCodecAttribute>();
                 var handler = i.GetRequiredService<ServerHandler>();
-                var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
-                var lengthFieldLength = config.GetValue(ServerHostOptions.LengthFieldLength, 4);
-                j.AddLengthFieldHanlder(packetMaxSize, lengthFieldLength);
-                j.AddLast(new TarsDecoder(codec), new TarsEncoder(codec), handler);
+                if (hasLengthField)
+                {
+                    var packetMaxSize = config.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
+                    var lengthFieldLength = config.GetValue(ServerHostOptions.LengthFieldLength, 4);
+                    j.AddLengthFieldHanlder(packetMaxSize, lengthFieldLength);
+                }
+                j.AddLast(new TarsRequestDecoder(codec), new TarsResponseEncoder(codec), handler);
             };
 
             switch (mode)
             {
                 case RpcMode.Udp:
-                    builder.UseUdp(action);
+                    builder.UseUdp((x, y) => action(x, y, false));
                     break;
 
                 case RpcMode.Tcp when isLibuv:
-                    builder.UseLibuvTcp(action);
+                    builder.UseLibuvTcp((x, y) => action(x, y, true));
                     break;
 
                 default:
-                    builder.UseTcp(action);
+                    builder.UseTcp((x, y) => action(x, y, true));
                     break;
             }
         }

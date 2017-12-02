@@ -8,9 +8,8 @@ namespace Tars.Csharp.Codecs
     {
         public static IChannelPipeline AddLengthFieldHanlder(this IChannelPipeline pipeline, int maxFrameLength, int lengthFieldLength)
         {
-            pipeline.AddLast(new LengthFieldPrepender(lengthFieldLength, true));
             pipeline.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.BigEndian,
-                maxFrameLength, 0, lengthFieldLength, -1 * lengthFieldLength, lengthFieldLength, true));
+                maxFrameLength, 0, lengthFieldLength, -1 * lengthFieldLength, 0, true));
             return pipeline;
         }
     }

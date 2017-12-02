@@ -6,11 +6,11 @@ using Tars.Csharp.Codecs.Attributes;
 
 namespace Tars.Csharp.Codecs
 {
-    public class TarsDecoder : ByteToMessageDecoder
+    public class TarsResponseDecoder : ByteToMessageDecoder
     {
         private TarsCodecAttribute tars;
 
-        public TarsDecoder(TarsCodecAttribute tars)
+        public TarsResponseDecoder(TarsCodecAttribute tars)
         {
             this.tars = tars;
         }
@@ -19,7 +19,7 @@ namespace Tars.Csharp.Codecs
         {
             while (input.IsReadable())
             {
-                output.Add(tars.DecodeRequest(input));
+                output.Add(tars.DecodeResponse(input));
             }
         }
     }

@@ -14,7 +14,7 @@ namespace Tars.Csharp.Network.Client
     {
         private ILogger<NettyTcpClient> logger;
 
-        public NettyTcpClient(ILogger<NettyTcpClient> logger, NetworkClientInitializer initializer)
+        public NettyTcpClient(ILogger<NettyTcpClient> logger, NetworkClientInitializer<ITcpClient> initializer)
         {
             this.logger = logger;
             Build(initializer);
@@ -24,7 +24,7 @@ namespace Tars.Csharp.Network.Client
         private Bootstrap bootstrap = new Bootstrap();
         private ConcurrentDictionary<EndPoint, IChannel> channels = new ConcurrentDictionary<EndPoint, IChannel>();
 
-        public NettyTcpClient Build(NetworkClientInitializer initializer)
+        public NettyTcpClient Build(NetworkClientInitializer<ITcpClient> initializer)
         {
             bootstrap
                 .Group(group)

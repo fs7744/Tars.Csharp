@@ -7,15 +7,34 @@ using Tars.Csharp.Network.Hosting;
 
 namespace Tars.Csharp.Rpc.Clients
 {
-    public class RpcClientInitializer : NetworkClientInitializer
+    public class RpcUdpClientInitializer : NetworkClientInitializer<IUdpClient>
+    {
+        private ClientHandler handler;
+        private TarsCodecAttribute tars;
+
+        public RpcUdpClientInitializer(ClientHandler handler, TarsCodecAttribute tars)
+        {
+            this.handler = handler;
+            this.tars = tars;
+        }
+
+        public override void Init(IChannel channel)
+        {
+            channel.Pipeline.AddLast(new ClientUdpHandler(), new TarsResponseDecoder(tars), handler);
+        }
+    }
+
+    public class RpcTcpClientInitializer : NetworkClientInitializer<ITcpClient>
     {
         private IConfigurationRoot configuration;
         private ClientHandler handler;
+        private TarsCodecAttribute tars;
 
-        public RpcClientInitializer(IConfigurationRoot configuration, ClientHandler handler)
+        public RpcTcpClientInitializer(IConfigurationRoot configuration, ClientHandler handler, TarsCodecAttribute tars)
         {
             this.configuration = configuration;
             this.handler = handler;
+            this.tars = tars;
         }
 
         public override void Init(IChannel channel)
@@ -23,7 +42,7 @@ namespace Tars.Csharp.Rpc.Clients
             var packetMaxSize = configuration.GetValue(ServerHostOptions.PacketMaxSize, 100 * 1024 * 1024);
             var lengthFieldLength = configuration.GetValue(ServerHostOptions.LengthFieldLength, 4);
             channel.Pipeline.AddLengthFieldHanlder(packetMaxSize, lengthFieldLength);
-            channel.Pipeline.AddLast(new TarsDecoder(new TarsCodecAttribute()), handler);
+            channel.Pipeline.AddLast(new TarsResponseDecoder(tars), handler);
         }
     }
 }

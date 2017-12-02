@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using DotNetty.Buffers;
+using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Network.Client;
 
@@ -25,10 +26,17 @@ namespace Tars.Csharp.Rpc.Clients
             var packet = context.CreatePacket();
             packet.FuncName = methodName;
             packet.Buffer = metadata.Codec.EncodeMethodParameters(parameters, methodMetadata);
-            var request = metadata.Codec.EncodeRequest(packet);
-            var task = client.SendAsync(context.EndPoint, request);
+            var buf = Unpooled.Buffer(128);
+            buf.WriteInt(0);
+            metadata.Codec.EncodeRequest(buf, packet);
+            var length = buf.WriterIndex;
+            buf.SetWriterIndex(0);
+            buf.WriteInt(length);
+            buf.SetWriterIndex(length);
+            var task = client.SendAsync(context.EndPoint, buf);
             var r = callBackHandler.AddCallBack(context.RequestId, context.Timeout).Result;
-            return r;
+            var info = metadata.Codec.DecodeReturnValue(r.Buffer, methodMetadata);
+            return info;
         }
 
         public Task ShutdownAsync()

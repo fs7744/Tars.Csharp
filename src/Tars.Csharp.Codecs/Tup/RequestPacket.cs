@@ -20,9 +20,9 @@ namespace Tars.Csharp.Codecs.Tup
 
         public int Timeout { get; set; }
 
-        public IDictionary<string, string> Context { get; set; }
+        public IDictionary<string, string> Context { get; set; } = new Dictionary<string, string>();
 
-        public IDictionary<string, string> Status { get; set; }
+        public IDictionary<string, string> Status { get; set; } = new Dictionary<string, string>();
 
         public int Ret { get; set; }
 
