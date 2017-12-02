@@ -46,6 +46,7 @@ namespace Tars.Csharp.Codecs.Attributes
                     response.Buffer = tis.Read(new byte[0], 6, true);
                     response.Status = tis.ReadMap<string, string>(new Dictionary<string, string>(), 7, false);
                     response.ResultDesc = tis.ReadString(8, false);
+                    response.Context = tis.ReadMap<string, string>(new Dictionary<string, string>(), 9, false);
                     break;
 
                 case Const.Version2:
@@ -227,12 +228,6 @@ namespace Tars.Csharp.Codecs.Attributes
             var outputStream = new TarsOutputStream(buf);
             outputStream.Write(request.Version, 1);
             outputStream.Write(request.PacketType, 2);
-            //outputStream.Write(request.RequestId, 3);
-            //outputStream.Write(request.MessageType, 4);
-            //outputStream.Write(request.Ret, 5);
-            //outputStream.Write(request.Buffer, 6);
-            //outputStream.Write(request.Status, 7);
-            //outputStream.Write(request.ResultDesc == null ? "" : request.ResultDesc, 8);
             outputStream.Write(request.MessageType, 3);
             outputStream.Write(request.RequestId, 4);
             outputStream.Write(request.ServantName, 5);
@@ -265,20 +260,24 @@ namespace Tars.Csharp.Codecs.Attributes
                     {
                         outputStream.Write(response.ResultDesc ?? "", 8);
                     }
+                    if (response.Context != null && response.Context.Count > 0)
+                    {
+                        outputStream.Write(response.Context, 9);
+                    }
                     break;
 
                 case Const.Version2:
                 case Const.Version3:
+                    response.Status.Add(Const.StatusResultCode, response.Ret.ToString());
+                    response.Status.Add(Const.StatusResultDesc, response.ResultDesc);
+
                     outputStream.Write(response.MessageType, 3);
                     outputStream.Write(response.RequestId, 4);
                     outputStream.Write(response.ServantName, 5);
                     outputStream.Write(response.FuncName, 6);
                     outputStream.Write(response.Buffer, 7);
                     outputStream.Write(response.Timeout, 8);
-                    if (response.Status != null && response.Status.Count > 0)
-                    {
-                        outputStream.Write(response.Status, 9);
-                    }
+                    outputStream.Write(response.Status, 9);
                     if (response.Context != null && response.Context.Count > 0)
                     {
                         outputStream.Write(response.Context, 10);

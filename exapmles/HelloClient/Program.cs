@@ -30,7 +30,7 @@ namespace HelloClient
             var context = new RpcContext()
             {
                 Servant = "TestApp.HelloServer.HelloObj",
-                EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8080),
+                EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8989),
                 Mode = RpcMode.Tcp
             };
             var proxy = factory.CreateProxy<IHelloRpc>(context);
