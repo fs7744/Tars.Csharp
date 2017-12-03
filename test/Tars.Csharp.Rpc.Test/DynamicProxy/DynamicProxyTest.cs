@@ -79,6 +79,39 @@ namespace Tars.Csharp.Rpc.Test.DynamicProxy
                 Assert.NotNull(e);
             }
         }
+
+        [Fact]
+        public void DynamicProxyCallHelloOutShouldNoError()
+        {
+            var context = new DynamicProxyContext()
+            {
+                Invoke = (c, s, ps) =>
+                {
+                    ps[1] = ps[0] + "66";
+                    return null;
+                }
+            };
+            var proxy = generator.CreateInterfaceProxy<IHelloRpc>(context);
+            proxy.HelloOut("vic", out string str);
+            Assert.Equal("vic66", str);
+        }
+
+        [Fact]
+        public void DynamicProxyCallHelloRefShouldNoError()
+        {
+            var context = new DynamicProxyContext()
+            {
+                Invoke = (c, s, ps) =>
+                {
+                    ps[1] = ps[0] + "99";
+                    return null;
+                }
+            };
+            var proxy = generator.CreateInterfaceProxy<IHelloRpc>(context);
+            string str = null;
+            proxy.HelloRef("vic", ref str);
+            Assert.Equal("vic99", str);
+        }
     }
 
     public interface IHelloRpc
@@ -90,5 +123,9 @@ namespace Tars.Csharp.Rpc.Test.DynamicProxy
         Task<string> HelloTask(int no, string name);
 
         ValueTask<string> HelloValueTask(int no, string name, DynamicProxyContext context);
+
+        void HelloOut(string n, out string name);
+
+        void HelloRef(string n, ref string name);
     }
 }

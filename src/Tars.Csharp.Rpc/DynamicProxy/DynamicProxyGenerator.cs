@@ -80,6 +80,7 @@ namespace Tars.Csharp.Rpc.DynamicProxy
                 }
                 ilGen.EmitInt(parameterTypes.Length);
                 ilGen.Emit(OpCodes.Newarr, typeof(object));
+                var hasRef = false;
                 for (var i = 0; i < parameterTypes.Length; i++)
                 {
                     ilGen.Emit(OpCodes.Dup);
@@ -87,6 +88,7 @@ namespace Tars.Csharp.Rpc.DynamicProxy
                     ilGen.EmitLoadArg(i + 1);
                     if (parameterTypes[i].IsByRef)
                     {
+                        hasRef = true;
                         ilGen.EmitLdRef(parameterTypes[i]);
                         ilGen.EmitConvertToObject(parameterTypes[i].GetElementType());
                     }
@@ -96,7 +98,29 @@ namespace Tars.Csharp.Rpc.DynamicProxy
                     }
                     ilGen.Emit(OpCodes.Stelem_Ref);
                 }
+                LocalBuilder parameters = null;
+                if (hasRef)
+                {
+                    parameters = ilGen.DeclareLocal(typeof(object[]));
+                    ilGen.Emit(OpCodes.Dup);
+                    ilGen.Emit(OpCodes.Stloc, parameters);
+                }
                 ilGen.Emit(OpCodes.Callvirt, InvokeProxy);
+                if (hasRef)
+                {
+                    for (var i = 0; i < parameterTypes.Length; i++)
+                    {
+                        if (parameterTypes[i].IsByRef)
+                        {
+                            ilGen.EmitLoadArg(i + 1);
+                            ilGen.Emit(OpCodes.Ldloc, parameters);
+                            ilGen.EmitInt(i);
+                            ilGen.Emit(OpCodes.Ldelem_Ref);
+                            ilGen.EmitConvertFromObject(parameterTypes[i].GetElementType());
+                            ilGen.EmitStRef(parameterTypes[i]);
+                        }
+                    }
+                }
                 if (method.ReturnType == typeof(void))
                 {
                     ilGen.Emit(OpCodes.Pop);
