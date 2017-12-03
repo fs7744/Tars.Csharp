@@ -10,6 +10,7 @@ namespace Tars.Csharp.Rpc
         public override bool IsSharable => true;
 
         private ServerRpcMetadata metadatas;
+
         public ServerHandler(ServerRpcMetadata metadatas)
         {
             this.metadatas = metadatas;
@@ -25,7 +26,6 @@ namespace Tars.Csharp.Rpc
             else if (metadatas.TryGetValue(msg.ServantName, out RpcMetadata metadata) &&
                 metadata.Methods.TryGetValue(msg.FuncName, out RpcMethodMetadata methodMetadata))
             {
-
                 var parameters = metadata.Codec.DecodeMethodParameters(msg, methodMetadata);
                 var returnValue = methodMetadata.Reflector.Invoke(metadata.ServantInstance, parameters);
                 response.Buffer = metadata.Codec.EncodeReturnValue(returnValue, parameters, response, methodMetadata);
@@ -33,7 +33,6 @@ namespace Tars.Csharp.Rpc
             }
             else
             {
-
             }
 
             ctx.WriteAsync(response);

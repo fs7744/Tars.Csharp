@@ -27,7 +27,7 @@ namespace Tars.Csharp.Codecs
                 {
                     var tups = i.GetServices<ITupCodecHandler>()
                         .GroupBy(j => j.Version)
-                        .Select(j=> j.First())
+                        .Select(j => j.First())
                         .ToDictionary(j => j.Version);
                     return new TarsCodecAttribute()
                     {

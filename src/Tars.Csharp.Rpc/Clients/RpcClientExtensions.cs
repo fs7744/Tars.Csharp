@@ -11,7 +11,7 @@ namespace Tars.Csharp.Rpc.Clients
     {
         public static IServiceCollection UseSimpleRpcClient(this IServiceCollection service, params Assembly[] assemblies)
         {
-            return service.AddSingleton(i => 
+            return service.AddSingleton(i =>
                 {
                     var metadata = new RpcClientMetadata(assemblies);
                     foreach (var item in metadata.metadatas)

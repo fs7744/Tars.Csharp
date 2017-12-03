@@ -107,7 +107,6 @@ namespace Tars.Csharp.Codecs
             }
             catch (IndexOutOfRangeException e)
             {
-
             }
             catch (TarsDecodeException e)
             {

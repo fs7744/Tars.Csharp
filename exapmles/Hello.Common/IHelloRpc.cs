@@ -8,6 +8,7 @@ namespace Hello.Common
     public interface IHelloRpc
     {
         string Hello(int no, string name);
+
         void HelloHolder(int no, out string name);
     }
 }
