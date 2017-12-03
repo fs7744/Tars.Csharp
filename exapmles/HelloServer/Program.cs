@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using Tars.Csharp.Codecs;
 using Tars.Csharp.Network.Hosting;
 using Tars.Csharp.Rpc;
 using Tars.Csharp.Rpc.Clients;
@@ -47,7 +48,8 @@ namespace HelloServer
                 .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
                 .ConfigureServices(i => i.AddLogging(j => j.AddConsole()
                     .SetMinimumLevel(LogLevel.Trace))
-                    .UseSimpleRpcClient(typeof(IHelloRpc).Assembly))
+                    .UseSimpleRpcClient(typeof(IHelloRpc).Assembly)
+                    .AddTarsCodec())
                 .UseRpc(RpcMode.Udp, true, typeof(IHelloRpc).Assembly, typeof(Program).Assembly)
                 .Build()
                 .Run();

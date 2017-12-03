@@ -29,7 +29,6 @@ namespace Tars.Csharp.Rpc.Clients
                 .AddSingleton<IDynamicProxyGenerator, DynamicProxyGenerator>()
                 .AddTransient<NetworkClientInitializer<ITcpClient>, RpcTcpClientInitializer>()
                 .AddSingleton<ClientHandler, ClientHandler>()
-                .AddTarsCodec()
                 .AddSingleton<ICallBackHandler<int>, CallBackHandler<int>>();
         }
     }

@@ -40,9 +40,11 @@ namespace Tars.Csharp.Rpc.Clients
             var task = client.SendAsync(context.EndPoint, buf);
             var r = callBackHandler.AddCallBack(packet.RequestId, context.Timeout).Result;
             var info = metadata.Codec.DecodeReturnValue(r, methodMetadata);
+            if (info.Item2 == null) return info.Item1;
             var index = 0;
             foreach (var item in methodMetadata.Parameters.Where(i => i.ParameterType.IsByRef))
             {
+                if (index >= info.Item2.Length) break;
                 parameters[item.Position] = info.Item2[index++];
             }
             return info.Item1;

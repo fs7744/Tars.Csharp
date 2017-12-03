@@ -18,8 +18,7 @@ namespace Tars.Csharp.Rpc
             UseTarsCodec(builder);
             builder.ConfigureServices(i =>
             {
-                var services = i.AddSingleton<ServerHandler, ServerHandler>()
-                                .AddTarsCodec();
+                var services = i.AddSingleton<ServerHandler, ServerHandler>();
                 foreach (var item in ms.metadatas)
                 {
                     services.AddSingleton(item.Value.InterfaceType, item.Value.ServantType);

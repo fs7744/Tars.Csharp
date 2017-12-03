@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Tars.Csharp.Codecs;
 using Tars.Csharp.Rpc;
 using Tars.Csharp.Rpc.Clients;
 
@@ -23,6 +24,7 @@ namespace HelloClient
             var service = new ServiceCollection()
                 .AddSingleton(i => builder.Build())
                 .AddLogging(j => j.AddConsole().SetMinimumLevel(LogLevel.Trace))
+                .AddTarsCodec()
                 .UseSimpleRpcClient(typeof(IHelloRpc).Assembly)
                 .BuildServiceProvider();
 
