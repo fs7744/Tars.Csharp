@@ -23,7 +23,7 @@ namespace Tars.Csharp.Codecs.Tup
         /// </summary>
         private Dictionary<string, object> cachedData = new Dictionary<string, object>(128);
 
-        public short Version { get; set; } = Const.PacketTypeTup;
+        public short Version { get; set; } = Const.PacketTypeTup2;
 
         public string EncodeName { get; set; } = "UTF-8";
 
@@ -408,7 +408,7 @@ namespace Tars.Csharp.Codecs.Tup
         public void DecodeTup2(TarsInputStream inputStream, int Index = 0)
         {
             inputStream.SetServerEncoding(EncodeName);
-            Version = Const.PacketTypeTup;
+            Version = Const.PacketTypeTup2;
             data = new Dictionary<string, Dictionary<string, byte[]>>();
             inputStream.ReadMap<string, Dictionary<string, byte[]>>(data, 0, false);
         }

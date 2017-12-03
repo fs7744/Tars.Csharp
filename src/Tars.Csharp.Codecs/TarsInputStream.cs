@@ -105,6 +105,10 @@ namespace Tars.Csharp.Codecs
                     SkipField(hd.Type);
                 }
             }
+            catch (IndexOutOfRangeException e)
+            {
+
+            }
             catch (TarsDecodeException e)
             {
                 //QTrace.Trace(e.Message);

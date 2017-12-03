@@ -1,4 +1,6 @@
 ﻿using DotNetty.Buffers;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Network.Client;
@@ -10,6 +12,7 @@ namespace Tars.Csharp.Rpc.Clients
         protected RpcClientMetadata metadatas;
         protected T client;
         private ICallBackHandler<int> callBackHandler;
+        private int requestId = 0;
 
         public RpcClient(RpcClientMetadata metadatas, T client, ICallBackHandler<int> callBackHandler)
         {
@@ -24,8 +27,9 @@ namespace Tars.Csharp.Rpc.Clients
                 || !metadata.Methods.TryGetValue(methodName, out RpcMethodMetadata methodMetadata)) return null;
 
             var packet = context.CreatePacket();
+            packet.RequestId = Interlocked.Increment(ref requestId);
             packet.FuncName = methodName;
-            packet.Buffer = metadata.Codec.EncodeMethodParameters(parameters, methodMetadata);
+            packet.Buffer = metadata.Codec.EncodeMethodParameters(parameters, packet, methodMetadata);
             var buf = Unpooled.Buffer(128);
             buf.WriteInt(0);
             metadata.Codec.EncodeRequest(buf, packet);
@@ -34,9 +38,14 @@ namespace Tars.Csharp.Rpc.Clients
             buf.WriteInt(length);
             buf.SetWriterIndex(length);
             var task = client.SendAsync(context.EndPoint, buf);
-            var r = callBackHandler.AddCallBack(context.RequestId, context.Timeout).Result;
-            var info = metadata.Codec.DecodeReturnValue(r.Buffer, methodMetadata);
-            return info;
+            var r = callBackHandler.AddCallBack(packet.RequestId, context.Timeout).Result;
+            var info = metadata.Codec.DecodeReturnValue(r, methodMetadata);
+            var index = 0;
+            foreach (var item in methodMetadata.Parameters.Where(i => i.ParameterType.IsByRef))
+            {
+                parameters[item.Position] = info.Item2[index++];
+            }
+            return info.Item1;
         }
 
         public Task ShutdownAsync()

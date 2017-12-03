@@ -1,4 +1,5 @@
 ﻿using DotNetty.Transport.Channels;
+using System;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
 
@@ -17,19 +18,25 @@ namespace Tars.Csharp.Rpc
         protected override void ChannelRead0(IChannelHandlerContext ctx, RequestPacket msg)
         {
             var response = msg.CreateResponse();
-            if (metadatas.TryGetValue(msg.ServantName, out RpcMetadata metadata) &&
+            if ("tars_ping".Equals(msg.FuncName, StringComparison.OrdinalIgnoreCase))
+            {
+                response.Buffer = new byte[0];
+            }
+            else if (metadatas.TryGetValue(msg.ServantName, out RpcMetadata metadata) &&
                 metadata.Methods.TryGetValue(msg.FuncName, out RpcMethodMetadata methodMetadata))
             {
+
                 var parameters = metadata.Codec.DecodeMethodParameters(msg, methodMetadata);
                 var returnValue = methodMetadata.Reflector.Invoke(metadata.ServantInstance, parameters);
-                response.Buffer = metadata.Codec.EncodeReturnValue(returnValue, methodMetadata);
+                response.Buffer = metadata.Codec.EncodeReturnValue(returnValue, parameters, response, methodMetadata);
                 //response.Ret = ?
-                ctx.WriteAsync(response);
             }
             else
             {
-                
+
             }
+
+            ctx.WriteAsync(response);
         }
     }
 }

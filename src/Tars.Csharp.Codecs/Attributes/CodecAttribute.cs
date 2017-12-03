@@ -12,16 +12,16 @@ namespace Tars.Csharp.Codecs.Attributes
 
         public abstract RequestPacket DecodeResponse(IByteBuffer input);
 
-        public abstract object[] DecodeMethodParameters(RequestPacket request, RpcMethodMetadata metdata);
+        public abstract object[] DecodeMethodParameters(RequestPacket input, RpcMethodMetadata metdata);
 
-        public abstract object DecodeReturnValue(byte[] input, RpcMethodMetadata metdata);
+        public abstract Tuple<object, object[]> DecodeReturnValue(RequestPacket input, RpcMethodMetadata metdata);
 
         public abstract void EncodeRequest(IByteBuffer output, RequestPacket request);
 
         public abstract void EncodeResponse(IByteBuffer output, RequestPacket response);
 
-        public abstract byte[] EncodeMethodParameters(object[] parameters, RpcMethodMetadata metdata);
+        public abstract byte[] EncodeMethodParameters(object[] parameters, RequestPacket request, RpcMethodMetadata metdata);
 
-        public abstract byte[] EncodeReturnValue(object returnValue, RpcMethodMetadata metdata);
+        public abstract byte[] EncodeReturnValue(object returnValue, object[] parameters, RequestPacket response, RpcMethodMetadata metdata);
     }
 }

@@ -77,10 +77,12 @@ namespace Tars.Csharp.Codecs.Util
             return CreateObject(typeof(T));
         }
 
-        public static object CreateObject(Type type)
+        public static object CreateObject(Type t)
         {
             try
             {
+                var type = t.IsByRef ? t.GetElementType() : t;
+
                 // String类型没有缺少构造函数，
                 if (type.ToString() == "System.String")
                 {

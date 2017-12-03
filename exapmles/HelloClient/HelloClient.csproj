@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Tars.Csharp.Rpc\Tars.Csharp.Rpc.csproj" />
+    <ProjectReference Include="..\Hello.Common\Hello.Common.csproj" />
   </ItemGroup>
 
 </Project>

@@ -19,7 +19,7 @@ namespace Tars.Csharp.Rpc
             builder.ConfigureServices(i =>
             {
                 var services = i.AddSingleton<ServerHandler, ServerHandler>()
-                                .AddSingleton<TarsCodecAttribute, TarsCodecAttribute>();
+                                .AddTarsCodec();
                 foreach (var item in ms.metadatas)
                 {
                     services.AddSingleton(item.Value.InterfaceType, item.Value.ServantType);
@@ -29,6 +29,7 @@ namespace Tars.Csharp.Rpc
                     foreach (var item in ms.metadatas)
                     {
                         item.Value.ServantInstance = j.GetRequiredService(item.Value.InterfaceType);
+                        item.Value.Codec = j.GetRequiredService(item.Value.CodecType) as CodecAttribute;
                     }
                     return ms;
                 });
@@ -73,10 +74,11 @@ namespace Tars.Csharp.Rpc
         {
             builder.ConfigureServices(i =>
             {
-                i.AddSingleton<CodecAttribute, TarsCodecAttribute>();
                 i.AddSingleton<IDictionary<string, CodecAttribute>>(j =>
                 {
                     var dict = new Dictionary<string, CodecAttribute>(StringComparer.OrdinalIgnoreCase);
+                    var tars = j.GetRequiredService<TarsCodecAttribute>();
+                    dict.Add(tars.Key, tars);
                     foreach (var item in j.GetServices<CodecAttribute>())
                     {
                         dict.Add(item.Key, item);

@@ -19,6 +19,8 @@ namespace Tars.Csharp.Codecs
         public Type ServantType { get; set; }
 
         public object ServantInstance { get; set; }
+
+        public Type CodecType { get; set; }
     }
 
     public class RpcMethodMetadata

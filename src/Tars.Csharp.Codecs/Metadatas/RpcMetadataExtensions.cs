@@ -26,7 +26,7 @@ namespace Tars.Csharp.Rpc
                 {
                     InterfaceType = item,
                     Servant = getKey(item),
-                    Codec = reflector.GetCustomAttribute<CodecAttribute>(),
+                    CodecType = reflector.GetCustomAttribute<CodecAttribute>().GetType(),
                     Methods = new Dictionary<string, RpcMethodMetadata>(StringComparer.OrdinalIgnoreCase)
                 };
                 SetMethodMetaDatas(metadata, isGenerateReflector);

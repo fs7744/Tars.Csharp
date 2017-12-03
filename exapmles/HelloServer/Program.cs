@@ -1,22 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Hello.Common;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Tars.Csharp.Codecs.Attributes;
 using Tars.Csharp.Network.Hosting;
 using Tars.Csharp.Rpc;
+using Tars.Csharp.Rpc.Clients;
 
 namespace HelloServer
 {
-    [Rpc(Servant = "TestApp.HelloServer.HelloObj")]
-    [TarsCodec]
-    public interface IHelloRpc
-    {
-        string Hello(int no, string name);
-    }
-
     public class HelloServer : IHelloRpc
     {
         public string Hello(int no, string name)
@@ -34,6 +27,11 @@ namespace HelloServer
             Console.WriteLine(result);
             return result;
         }
+
+        public void HelloHolder(int no, out string name)
+        {
+            name = no.ToString() + "Vic";
+        }
     }
 
     public class Program
@@ -47,8 +45,10 @@ namespace HelloServer
 
             new ServerHostBuilder()
                 .ConfigureAppConfiguration(i => i.AddInMemoryCollection(kv))
-                .ConfigureServices(i => i.AddLogging(j => j.AddConsole().SetMinimumLevel(LogLevel.Trace)))
-                .UseRpc(RpcMode.Udp, true, typeof(Program).Assembly)
+                .ConfigureServices(i => i.AddLogging(j => j.AddConsole()
+                    .SetMinimumLevel(LogLevel.Trace))
+                    .UseSimpleRpcClient(typeof(IHelloRpc).Assembly))
+                .UseRpc(RpcMode.Udp, true, typeof(IHelloRpc).Assembly, typeof(Program).Assembly)
                 .Build()
                 .Run();
         }

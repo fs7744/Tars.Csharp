@@ -14,7 +14,7 @@
 
         public static byte PacketTypeTarsnormal = 0;
         public static byte PacketTypeTarsoneway = 1;
-        public static byte PacketTypeTup = 2;
+        public static byte PacketTypeTup2 = 2;
         public static byte PacketTypeTup3 = 3;
 
         public const short Version = 0x01;
