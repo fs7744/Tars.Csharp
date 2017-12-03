@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Network.Hosting;
 using Tars.Csharp.Rpc;
@@ -32,6 +34,22 @@ namespace HelloServer
         public void HelloHolder(int no, out string name)
         {
             name = no.ToString() + "Vic";
+        }
+
+        public void HelloOneway(int no, string name)
+        {
+            Thread.Sleep(3000);
+            Console.WriteLine($"From oneway - {no}: Hi, {name}");
+        }
+
+        public async Task<string> HelloTask(int no, string name)
+        {
+            return Hello(no, name);
+        }
+
+        public async ValueTask<string> HelloValueTask(int no, string name)
+        {
+            return Hello(no, name);
         }
     }
 

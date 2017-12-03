@@ -1,6 +1,6 @@
 ﻿namespace Tars.Csharp.Network.Client
 {
-    public interface IUdpClient : IClient
+    public interface IUdpClient : INetworkClient
     {
     }
 }

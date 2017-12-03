@@ -42,9 +42,9 @@ namespace Tars.Csharp.Codecs.Tup
             var buf = Unpooled.WrappedBuffer(body);
             var input = new TarsInputStream(buf);
             object result = null;
-            if (metdata.ReturnInfo.ParameterType != typeof(void))
+            if (metdata.RealReturnType != typeof(void))
             {
-                result = unaIn.GetByClass(string.Empty, BasicClassTypeUtil.CreateObject(metdata.ReturnInfo.ParameterType), input);
+                result = unaIn.GetByClass(string.Empty, BasicClassTypeUtil.CreateObject(metdata.RealReturnType), input);
             }
             var ps = metdata.Parameters
                 .Select(i => unaIn.GetByClass(i.Name, BasicClassTypeUtil.CreateObject(i.ParameterType),
@@ -70,7 +70,7 @@ namespace Tars.Csharp.Codecs.Tup
         public override byte[] EncodeReturnValue(object returnValue, object[] parameters, RpcMethodMetadata metdata)
         {
             var unaOut = CreateUniAttribute();
-            if (returnValue != null && metdata.ReturnInfo.ParameterType != typeof(void))
+            if (returnValue != null && metdata.RealReturnType != typeof(void))
             {
                 unaOut.Put(string.Empty, returnValue);
             }

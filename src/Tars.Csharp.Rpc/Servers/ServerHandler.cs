@@ -1,5 +1,6 @@
 ﻿using DotNetty.Transport.Channels;
 using System;
+using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Tup;
 
@@ -28,6 +29,10 @@ namespace Tars.Csharp.Rpc
             {
                 var parameters = metadata.Codec.DecodeMethodParameters(msg, methodMetadata);
                 var returnValue = methodMetadata.Reflector.Invoke(metadata.ServantInstance, parameters);
+                if (methodMetadata.Invoke != null)
+                {
+                    returnValue = methodMetadata.Invoke.StaticInvoke(returnValue);
+                }
                 response.Buffer = metadata.Codec.EncodeReturnValue(returnValue, parameters, response, methodMetadata);
                 //response.Ret = ?
             }

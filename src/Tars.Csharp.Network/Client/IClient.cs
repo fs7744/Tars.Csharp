@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Tars.Csharp.Network.Client
 {
-    public interface IClient
+    public interface INetworkClient
     {
         Task ShutdownGracefullyAsync();
 

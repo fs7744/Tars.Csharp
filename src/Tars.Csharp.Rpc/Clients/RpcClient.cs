@@ -3,11 +3,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
+using Tars.Csharp.Codecs.Attributes;
 using Tars.Csharp.Network.Client;
 
 namespace Tars.Csharp.Rpc.Clients
 {
-    public class RpcClient<T> : IRpcClient where T : IClient
+    public class RpcClient<T> : IRpcClient where T : INetworkClient
     {
         protected RpcClientMetadata metadatas;
         protected T client;
@@ -38,16 +39,40 @@ namespace Tars.Csharp.Rpc.Clients
             buf.WriteInt(length);
             buf.SetWriterIndex(length);
             var task = client.SendAsync(context.EndPoint, buf);
-            var r = callBackHandler.AddCallBack(packet.RequestId, context.Timeout).Result;
-            var info = metadata.Codec.DecodeReturnValue(r, methodMetadata);
-            if (info.Item2 == null) return info.Item1;
-            var index = 0;
-            foreach (var item in methodMetadata.Parameters.Where(i => i.ParameterType.IsByRef))
+            return HandleResult(task, methodMetadata, packet.RequestId, context.Timeout, parameters, metadata.Codec);
+        }
+
+        private object HandleResult(Task task, RpcMethodMetadata methodMetadata, int requestId, int timeout, object[] parameters, CodecAttribute codec)
+        {
+            switch (methodMetadata.InvokeStatus)
             {
-                if (index >= info.Item2.Length) break;
-                parameters[item.Position] = info.Item2[index++];
+                case InvokeStatus.SyncCall:
+                    return Callback(methodMetadata, requestId, timeout, parameters, codec).Result;
+
+                case InvokeStatus.AsyncCall:
+                    return Callback(methodMetadata, requestId, timeout, parameters, codec);
+
+                case InvokeStatus.Oneway:
+                default:
+                    return null;
             }
-            return info.Item1;
+        }
+
+        private Task<object> Callback(RpcMethodMetadata methodMetadata, int requestId, int timeout, object[] parameters, CodecAttribute codec)
+        {
+            return callBackHandler.AddCallBack(requestId, timeout)
+                .ContinueWith(t =>
+                {
+                    var info = codec.DecodeReturnValue(t.Result, methodMetadata);
+                    if (info.Item2 == null) return info.Item1;
+                    var index = 0;
+                    foreach (var item in methodMetadata.Parameters.Where(i => i.ParameterType.IsByRef))
+                    {
+                        if (index >= info.Item2.Length) break;
+                        parameters[item.Position] = info.Item2[index++];
+                    }
+                    return info.Item1;
+                });
         }
 
         public Task ShutdownAsync()

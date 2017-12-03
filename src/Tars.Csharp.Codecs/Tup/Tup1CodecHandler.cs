@@ -50,8 +50,8 @@ namespace Tars.Csharp.Codecs.Tup
         {
             var buf = Unpooled.WrappedBuffer(body);
             var stream = new TarsInputStream(buf);
-            object result = metdata.ReturnInfo.ParameterType == typeof(void) ? null
-                : stream.Read(BasicClassTypeUtil.CreateObject(metdata.ReturnInfo.ParameterType), metdata.ReturnInfo.Position + 1, true);
+            object result = metdata.RealReturnType == typeof(void) ? null
+                : stream.Read(BasicClassTypeUtil.CreateObject(metdata.RealReturnType), metdata.ReturnInfo.Position + 1, true);
             var ps = metdata.Parameters
                 .Where(i => i.ParameterType.IsByRef)
                 .Select(i => stream.Read(BasicClassTypeUtil.CreateObject(i.ParameterType), i.Position + 1, false))
@@ -116,7 +116,7 @@ namespace Tars.Csharp.Codecs.Tup
         {
             var buf = Unpooled.Buffer(128);
             var output = new TarsOutputStream(buf);
-            if (metdata.ReturnInfo.ParameterType != typeof(void))
+            if (metdata.RealReturnType != typeof(void))
             {
                 output.Write(returnValue, 0);
             }

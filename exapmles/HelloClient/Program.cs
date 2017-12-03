@@ -40,6 +40,10 @@ namespace HelloClient
             Console.WriteLine(result);
             proxy.HelloHolder(5, out result);
             Console.WriteLine(result);
+            var taskResult = await proxy.HelloTask(5, "HelloTask");
+            Console.WriteLine(taskResult);
+            Console.WriteLine(await proxy.HelloValueTask(5, "HelloValueTask"));
+            proxy.HelloOneway(5, "HelloValueTask");
             Console.ReadKey();
             await factory.ShutdownAsync();
         }

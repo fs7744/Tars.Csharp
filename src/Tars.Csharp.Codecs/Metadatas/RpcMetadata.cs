@@ -1,7 +1,5 @@
-﻿using AspectCore.Extensions.Reflection;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Tars.Csharp.Codecs.Attributes;
 
 namespace Tars.Csharp.Codecs
@@ -21,14 +19,5 @@ namespace Tars.Csharp.Codecs
         public object ServantInstance { get; set; }
 
         public Type CodecType { get; set; }
-    }
-
-    public class RpcMethodMetadata
-    {
-        public string Name { get; set; }
-        public ParameterInfo ReturnInfo { get; set; }
-        public ParameterInfo[] Parameters { get; set; }
-        public MethodInfo MethodInfo { get; set; }
-        public MethodReflector Reflector { get; set; }
     }
 }

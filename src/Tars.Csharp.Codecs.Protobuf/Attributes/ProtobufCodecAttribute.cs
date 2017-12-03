@@ -28,9 +28,9 @@ namespace Tars.Csharp.Codecs.Attributes
 
         public override Tuple<object, object[]> DecodeReturnValue(RequestPacket input, RpcMethodMetadata metdata)
         {
-            if (metdata.ReturnInfo.ParameterType == typeof(void) || metdata.ReturnInfo.ParameterType == typeof(Task)) return Tuple.Create<object, object[]>(null, null);
+            if (metdata.RealReturnType == typeof(void)) return Tuple.Create<object, object[]>(null, null);
             var ins = new CodedInputStream(input.Buffer);
-            var result = Activator.CreateInstance(metdata.ReturnInfo.ParameterType);
+            var result = Activator.CreateInstance(metdata.RealReturnType);
             MergeFrom.Invoke(result, ins);
             return Tuple.Create<object, object[]>(result, null);
         }
