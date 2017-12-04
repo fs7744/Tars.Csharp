@@ -71,7 +71,7 @@ namespace Tars.Csharp.Rpc.DynamicProxy
                 ilGen.EmitThis();
                 ilGen.Emit(OpCodes.Ldfld, fieldBuilder);
                 ilGen.Emit(OpCodes.Dup);
-                ilGen.EmitString(method.Name);
+                ilGen.EmitString(method.GetReflector().DisplayName);
                 var parameterTypes = method.GetParameterTypes();
                 if (parameterTypes.Length == 0)
                 {

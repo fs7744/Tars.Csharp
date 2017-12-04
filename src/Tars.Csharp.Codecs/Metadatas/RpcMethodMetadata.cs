@@ -17,5 +17,6 @@ namespace Tars.Csharp.Codecs
         public Type RealReturnType { get; set; }
         public bool IsTask { get; set; }
         public MethodReflector Invoke { get; set; }
+        public string DisplayName { get; set; }
     }
 }

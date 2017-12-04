@@ -49,6 +49,7 @@ namespace Tars.Csharp.Rpc
                 var returnInfo = method.ReturnType.GetTypeInfo();
                 var m = new RpcMethodMetadata()
                 {
+                    DisplayName = method.GetReflector().DisplayName,
                     Name = method.Name,
                     ReturnInfo = method.ReturnParameter,
                     Parameters = method.GetParameters(),
@@ -59,8 +60,9 @@ namespace Tars.Csharp.Rpc
                     IsTaskWithResult = returnInfo.IsTaskWithResult(),
                     IsTask = returnInfo.IsTask(),
                 };
+                var testName = method.GetReflector().DisplayName;
                 SetConvertReturnType(returnInfo, m);
-                metadata.Methods.Add(m.Name, m);
+                metadata.Methods.Add(m.DisplayName, m);
             }
         }
 

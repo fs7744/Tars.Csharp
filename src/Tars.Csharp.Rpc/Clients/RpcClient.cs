@@ -29,7 +29,7 @@ namespace Tars.Csharp.Rpc.Clients
 
             var packet = context.CreatePacket();
             packet.RequestId = Interlocked.Increment(ref requestId);
-            packet.FuncName = methodName;
+            packet.FuncName = methodMetadata.Name;
             packet.Buffer = metadata.Codec.EncodeMethodParameters(parameters, packet, methodMetadata);
             var buf = Unpooled.Buffer(128);
             buf.WriteInt(0);
