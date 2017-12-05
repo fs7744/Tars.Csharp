@@ -50,7 +50,7 @@ namespace Tars.Csharp.Rpc
                 var m = new RpcMethodMetadata()
                 {
                     DisplayName = method.GetReflector().DisplayName,
-                    Name = method.Name,
+                    Name = HandleFuncName(method.Name),
                     ReturnInfo = method.ReturnParameter,
                     Parameters = method.GetParameters(),
                     MethodInfo = method,
@@ -64,6 +64,12 @@ namespace Tars.Csharp.Rpc
                 SetConvertReturnType(returnInfo, m);
                 metadata.Methods.Add(m.DisplayName, m);
             }
+        }
+
+        private static string HandleFuncName(string name)
+        {
+            var funcName = name.ToLower();
+            return funcName.EndsWith("async") ? funcName.Replace("async", "") : funcName;
         }
 
         private static void SetConvertReturnType(TypeInfo returnInfo, RpcMethodMetadata metadata)
