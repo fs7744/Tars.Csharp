@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Attributes;
+using Tars.Csharp.Codecs.Tup;
 using Tars.Csharp.Network.Client;
 
 namespace Tars.Csharp.Rpc.Clients
@@ -61,6 +62,8 @@ namespace Tars.Csharp.Rpc.Clients
             return callBackHandler.AddCallBack(requestId, timeout)
                 .ContinueWith(t =>
                 {
+                    if (t.Result.Ret != Const.ServerSuccess)
+                        throw new TarsException(t.Result.Ret, t.Result.ResultDesc);
                     var info = codec.DecodeReturnValue(t.Result, methodMetadata);
                     if (info.Item2 == null) return info.Item1;
                     var index = 0;
