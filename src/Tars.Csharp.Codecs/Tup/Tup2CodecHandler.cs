@@ -21,6 +21,7 @@ namespace Tars.Csharp.Codecs.Tup
             response.Timeout = input.Read(0, 8, true);
             response.Status = input.ReadMap<string, string>(new Dictionary<string, string>(), 9, false);
             response.Context = input.ReadMap<string, string>(new Dictionary<string, string>(), 10, false);
+            response.GetRetToStatus();
         }
 
         public override object[] DecodeMethodParameters(byte[] body, RpcMethodMetadata metdata)
@@ -49,7 +50,7 @@ namespace Tars.Csharp.Codecs.Tup
             var ps = metdata.Parameters
                 .Select(i => unaIn.GetByClass(i.Name, BasicClassTypeUtil.CreateObject(i.ParameterType),
                     input))
-                .ToArray(); ;
+                .ToArray();
             return Tuple.Create(result, ps);
         }
 
@@ -82,6 +83,21 @@ namespace Tars.Csharp.Codecs.Tup
             var output = new TarsOutputStream(buf);
             unaOut.WriteTo(output);
             return output.ToByteArray();
+        }
+
+        public override void EncodeResponse(TarsOutputStream output, RequestPacket response)
+        {
+            response.SetRetToStatus();
+            output.Write(response.Version, 1);
+            output.Write(response.PacketType, 2);
+            output.Write(response.MessageType, 3);
+            output.Write(response.RequestId, 4);
+            output.Write(response.ServantName, 5);
+            output.Write(response.FuncName, 5);
+            output.Write(response.Buffer, 7);
+            output.Write(response.Timeout, 8);
+            output.Write(response.Status, 9);
+            output.Write(response.Context, 10);
         }
 
         protected virtual UniAttribute CreateUniAttribute()

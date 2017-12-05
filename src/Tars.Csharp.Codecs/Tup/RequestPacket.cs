@@ -38,7 +38,28 @@ namespace Tars.Csharp.Codecs.Tup
                 ServantName = ServantName,
                 FuncName = FuncName,
                 Timeout = Timeout,
+                Context = new Dictionary<string, string>(),
+                Status = new Dictionary<string, string>()
             };
+        }
+
+        public void SetRetToStatus()
+        {
+            Status.Add(Const.StatusResultCode, Ret.ToString());
+            Status.Add(Const.StatusResultDesc, ResultDesc ?? "");
+        }
+
+        public void GetRetToStatus()
+        {
+            if (Status.TryGetValue(Const.StatusResultCode, out string code))
+            {
+                int.TryParse(code, out int ret);
+                Ret = ret;
+            }
+            if (Status.TryGetValue(Const.StatusResultDesc, out string retStatus))
+            {
+                ResultDesc = retStatus;
+            }
         }
     }
 }
