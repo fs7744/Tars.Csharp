@@ -5,16 +5,10 @@ using Tars.Csharp.Codecs.Tup;
 
 namespace Tars.Csharp.Rpc.Clients
 {
-    public interface ICallBackHandler<T>
-    {
-        Task<RequestPacket> AddCallBack(T key, int timeout);
-
-        void SetResult(T key, RequestPacket result);
-    }
-
     public class CallBackHandler<T> : ICallBackHandler<T>
     {
         private ConcurrentDictionary<T, TaskCompletionSource<RequestPacket>> results = new ConcurrentDictionary<T, TaskCompletionSource<RequestPacket>>();
+        private int requestId = 0;
 
         public Task<RequestPacket> AddCallBack(T key, int timeout)
         {
@@ -24,6 +18,11 @@ namespace Tars.Csharp.Rpc.Clients
             results.AddOrUpdate(key, source, (x, y) => source);
             tokenSource.CancelAfter(timeout);
             return source.Task;
+        }
+
+        public int NewRequestId()
+        {
+            return Interlocked.Increment(ref requestId);
         }
 
         public void SetResult(T key, RequestPacket result)

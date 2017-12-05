@@ -1,6 +1,5 @@
 ﻿using DotNetty.Buffers;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Attributes;
@@ -13,7 +12,6 @@ namespace Tars.Csharp.Rpc.Clients
         protected RpcClientMetadata metadatas;
         protected T client;
         private ICallBackHandler<int> callBackHandler;
-        private int requestId = 0;
 
         public RpcClient(RpcClientMetadata metadatas, T client, ICallBackHandler<int> callBackHandler)
         {
@@ -28,7 +26,7 @@ namespace Tars.Csharp.Rpc.Clients
                 || !metadata.Methods.TryGetValue(methodName, out RpcMethodMetadata methodMetadata)) return null;
 
             var packet = context.CreatePacket();
-            packet.RequestId = Interlocked.Increment(ref requestId);
+            packet.RequestId = callBackHandler.NewRequestId();
             packet.FuncName = methodMetadata.Name;
             packet.Buffer = metadata.Codec.EncodeMethodParameters(parameters, packet, methodMetadata);
             var buf = Unpooled.Buffer(128);
