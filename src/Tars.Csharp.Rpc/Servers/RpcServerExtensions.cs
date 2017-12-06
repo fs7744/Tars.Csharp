@@ -39,7 +39,7 @@ namespace Tars.Csharp.Rpc
 
         private static void ConfigHost(ServerHostBuilder builder, RpcMode mode, bool isLibuv)
         {
-            Action<IServiceProvider, IChannelPipeline, bool> action = (i, j, hasLengthField) =>
+            void action(IServiceProvider i, IChannelPipeline j, bool hasLengthField)
             {
                 var config = i.GetRequiredService<IConfigurationRoot>();
                 var codec = i.GetRequiredService<TarsCodecAttribute>();
@@ -51,7 +51,7 @@ namespace Tars.Csharp.Rpc
                     j.AddLengthFieldHanlder(packetMaxSize, lengthFieldLength);
                 }
                 j.AddLast(new TarsRequestDecoder(codec), new TarsResponseEncoder(codec), handler);
-            };
+            }
 
             switch (mode)
             {
