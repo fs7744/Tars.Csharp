@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Tars.Csharp.Rpc.Config
 {
@@ -7,15 +9,15 @@ namespace Tars.Csharp.Rpc.Config
     {
         public static readonly Endpoint VOID_ENDPOINT = new Endpoint("tcp", "0.0.0.0", 0, 0, 0, 0, null);
         private int hash;
-        public string Type { get; private set; }
-        public string Host { get; private set; }
-        public int Port { get; private set; }
-        public int Timeout { get; private set; }
-        public int Grid { get; private set; }
-        public int Qos { get; private set; }
-        public string SetDivision { get; private set; }
+        public string Type { get; set; }
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public int Timeout { get; set; }
+        public int Grid { get; set; }
+        public int Qos { get; set; }
+        public string SetDivision { get; set; }
 
-        public Endpoint(String type, String host, int port, int timeout, int grid, int qos, String setDivision)
+        public Endpoint(string type, string host, int port, int timeout, int grid, int qos, string setDivision)
         {
             Type = type;
             Host = host;
@@ -91,7 +93,7 @@ namespace Tars.Csharp.Rpc.Config
             int qos = 0;
             string setDivision = null;
 
-            string[] fields = node.Split(new string[] { "\\s+" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] fields = Regex.Split(node, "\\s+");
             if ("tcp".Equals(fields[0], StringComparison.OrdinalIgnoreCase))
             {
                 type = "tcp";

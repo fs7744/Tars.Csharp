@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Tars.Csharp.Codecs;
 using Tars.Csharp.Codecs.Attributes;
 using Tars.Csharp.Network.Client;
 using Tars.Csharp.Rpc.DynamicProxy;

@@ -4,31 +4,32 @@ namespace Tars.Csharp.Rpc.Config
 {
     public class ClientConfig
     {
-        public string Locator { get; private set; }
+        public string Locator { get; set; }
         public string LogPath { get; set; }
         public string LogLevel { get; set; }
         public string DataPath { get; set; }
-        public int SyncInvokeTimeout { get; private set; }
-        public int AsyncInvokeTimeout { get; private set; }
-        public int RefreshEndpointInterval { get; private set; }
-        public string Stat { get; private set; }
-        public string Property { get; private set; }
-        public int ReportInterval { get; private set; }
-        public int SampleRate { get; private set; }
-        public int MaxSampleCount { get; private set; }
-        public int SendThread { get; private set; }
-        public int RecvThread { get; private set; }
-        public int AsyncThread { get; private set; }
-        public string ModuleName { get; private set; }
-        public string SetDivision { get; private set; }
-        public bool EnableSet { get; private set; }
-        public int Connections { get; private set; }
-        public int ConnectTimeout { get; private set; }
-        public int CorePoolSize { get; private set; }
-        public int MaxPoolSize { get; private set; }
-        public int KeepAliveTime { get; private set; }
-        public int QueueSize { get; private set; }
-        public string CharsetName { get; private set; }
+        public int SyncInvokeTimeout { get; set; }
+        public int AsyncInvokeTimeout { get; set; }
+        public int RefreshEndpointInterval { get; set; }
+        public string Stat { get; set; }
+        public string Property { get; set; }
+        public int ReportInterval { get; set; }
+        public int SampleRate { get; set; }
+        public int MaxSampleCount { get; set; }
+        public int SendThread { get; set; }
+        public int RecvThread { get; set; }
+        public int AsyncThread { get; set; }
+        public string ModuleName { get; set; }
+        public string SetDivision { get; set; }
+        public bool EnableSet { get; set; }
+        public int Connections { get; set; }
+        public int ConnectTimeout { get; set; }
+        public int CorePoolSize { get; set; }
+        public int MaxPoolSize { get; set; }
+        public int KeepAliveTime { get; set; }
+        public int QueueSize { get; set; }
+        public string CharsetName { get; set; }
+        public Type InterfaceType { get; set; }
 
         public ClientConfig Load(TarsConfig conf)
         {
@@ -67,6 +68,7 @@ namespace Tars.Csharp.Rpc.Config
             KeepAliveTime = conf.GetInt("/tars/application/client<keepalivetime>", Constants.default_keep_alive_time);
             QueueSize = conf.GetInt("/tars/application/client<queuesize>", Constants.default_queue_size);
             CharsetName = conf.Get("/tars/application/client<charsetname>", Constants.default_charset_name);
+            InterfaceType = Type.GetType(conf.Get("/tars/application/client<interfacetype>"));
             return this;
         }
 

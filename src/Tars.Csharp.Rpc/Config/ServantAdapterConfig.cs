@@ -1,15 +1,18 @@
-﻿namespace Tars.Csharp.Rpc.Config
+﻿using System;
+
+namespace Tars.Csharp.Rpc.Config
 {
     public class ServantAdapterConfig
     {
         public Endpoint Endpoint { get; set; }
-        public string HandleGroup { get; private set; }
-        public string Protocol { get; private set; }
-        public int MaxConns { get; private set; }
-        public int QueueCap { get; private set; }
-        public int QueueTimeout { get; private set; }
+        public string HandleGroup { get; set; }
+        public string Protocol { get; set; }
+        public int MaxConns { get; set; }
+        public int QueueCap { get; set; }
+        public int QueueTimeout { get; set; }
         public string Servant { get; set; }
-        public int Threads { get; private set; }
+        public int Threads { get; set; }
+        public Type ClassType { get; set; }
 
         public ServantAdapterConfig Load(TarsConfig conf, string adapterName)
         {
@@ -22,6 +25,8 @@
             QueueTimeout = conf.GetInt(path + "<queuetimeout>", 10000);
             Servant = conf.Get(path + "<servant>");
             Threads = conf.GetInt(path + "<threads>", 1);
+            var info = conf.Get(path + "<classtype>");
+            ClassType = Type.GetType(info);
             return this;
         }
     }

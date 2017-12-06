@@ -1,31 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Tars.Csharp.Rpc.Config
 {
     public class ServerConfig
     {
-        public ClientConfig ClientConfig { get; private set; }
-        public string Application { get; private set; }
-        public string ServerName { get; private set; }
-        public Endpoint Local { get; private set; }
-        public string Node { get; private set; }
-        public string BasePath { get; private set; }
-        public string DataPath { get; private set; }
-        public string CharsetName { get; private set; }
-        public string Config { get; private set; }
-        public string Notify { get; private set; }
-        public string Log { get; private set; }
-        public string LogPath { get; private set; }
-        public string LogLevel { get; private set; }
-        public int LogRate { get; private set; }
-        public string LocalIP { get; private set; }
-        public int SessionTimeOut { get; private set; }
-        public int SessionCheckInterval { get; private set; }
-        public int UdpBufferSize { get; private set; }
-        public bool TcpNoDelay { get; private set; }
-        public Dictionary<string, ServantAdapterConfig> ServantAdapterConfMap { get; private set; }
+        public ClientConfig ClientConfig { get; set; }
+        public string Application { get; set; }
+        public string ServerName { get; set; }
+        public Endpoint Local { get; set; }
+        public string Node { get; set; }
+        public string BasePath { get; set; }
+        public string DataPath { get; set; }
+        public string CharsetName { get; set; }
+        public string Config { get; set; }
+        public string Notify { get; set; }
+        public string Log { get; set; }
+        public string LogPath { get; set; }
+        public string LogLevel { get; set; }
+        public int LogRate { get; set; }
+        public string LocalIP { get; set; }
+        public int SessionTimeOut { get; set; }
+        public int SessionCheckInterval { get; set; }
+        public int UdpBufferSize { get; set; }
+        public bool TcpNoDelay { get; set; }
+        public Dictionary<string, ServantAdapterConfig> ServantAdapterConfMap { get; set; }
 
         public ServerConfig Load(TarsConfig conf)
         {
@@ -73,9 +75,11 @@ namespace Tars.Csharp.Rpc.Config
                 }
             }
 
-            ServantAdapterConfig adminServantAdapterConfig = new ServantAdapterConfig();
-            adminServantAdapterConfig.Endpoint = Local;
-            adminServantAdapterConfig.Servant = $"{Application}.{ServerName}.{Constants.AdminServant}";
+            ServantAdapterConfig adminServantAdapterConfig = new ServantAdapterConfig
+            {
+                Endpoint = Local,
+                Servant = $"{Application}.{ServerName}.{Constants.AdminServant}"
+            };
             ServantAdapterConfMap.Add(Constants.AdminServant,
                     adminServantAdapterConfig);
 
@@ -94,9 +98,9 @@ namespace Tars.Csharp.Rpc.Config
             return this;
         }
 
-        public static ServerConfig ParseFrom()
+        public static ServerConfig ParseFrom(string path)
         {
-            return new ServerConfig().Load(TarsConfig.ParseFile(Environment.GetEnvironmentVariable("config")));
+            return new ServerConfig().Load(TarsConfig.ParseFile(path));
         }
     }
 }

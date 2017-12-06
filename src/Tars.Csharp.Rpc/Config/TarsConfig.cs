@@ -34,7 +34,7 @@ namespace Tars.Csharp.Rpc.Config
                 }
                 if (line.StartsWith(TAG_OVER) && line.EndsWith(TAG_CLOSE))
                 {
-                    string name = line.Substring(TAG_OVER.Length, line.Length - TAG_CLOSE.Length);
+                    string name = line.Substring(TAG_OVER.Length, line.Length - TAG_CLOSE.Length - TAG_OVER.Length);
                     string path = stack.Last.Value;
                     if (!path.EndsWith("/" + name))
                     {
@@ -44,7 +44,7 @@ namespace Tars.Csharp.Rpc.Config
                 }
                 else if (line.StartsWith(TAG_STARTER) && line.EndsWith(TAG_ENDER))
                 {
-                    string name = line.Substring(TAG_STARTER.Length, line.Length - TAG_ENDER.Length);
+                    string name = line.Substring(TAG_STARTER.Length, line.Length - TAG_ENDER.Length - TAG_STARTER.Length);
                     string path = stack.Last.Value;
                     string newPath = path + "/" + name;
                     subTags[path].Add(name);
@@ -59,7 +59,7 @@ namespace Tars.Csharp.Rpc.Config
                 }
                 else if (line.StartsWith(TAG_STARTER) && line.EndsWith(TAG_CLOSE))
                 {
-                    string name = line.Substring(TAG_STARTER.Length, line.Length - TAG_CLOSE.Length);
+                    string name = line.Substring(TAG_STARTER.Length, line.Length - TAG_CLOSE.Length - TAG_STARTER.Length);
                     string path = stack.Last.Value;
                     string newPath = path + "/" + name;
                     subTags[path].Add(name);
@@ -110,7 +110,8 @@ namespace Tars.Csharp.Rpc.Config
 
         public string Get(string path, bool escape)
         {
-            return escape ? escapedValues[path] : values[path];
+            return escape ? (escapedValues.TryGetValue(path, out string result) ? result : string.Empty) 
+                : (values.TryGetValue(path, out result) ? result : string.Empty);
         }
 
         public string Get(string path)

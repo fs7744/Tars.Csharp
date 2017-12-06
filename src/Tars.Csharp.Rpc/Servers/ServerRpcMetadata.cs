@@ -20,6 +20,12 @@ namespace Tars.Csharp.Rpc
             ChangeMethodsDictionaryForServer();
         }
 
+        public ServerRpcMetadata ChangeRpcMetadataKeyForConfig()
+        {
+            metadatas = metadatas.Values.ToDictionary(i => i.Servant, StringComparer.OrdinalIgnoreCase);
+            return this;
+        }
+
         private void ChangeMethodsDictionaryForServer()
         {
             foreach (var item in metadatas.Values)
