@@ -1,3 +1,5 @@
+#  [give up] 所有内容现已在 https://github.com/TarsNET 重新开始
+
 # Tars.Csharp
 
 Tars.Csharp 是 https://github.com/Tencent/Tars 的 dotnet 版本
